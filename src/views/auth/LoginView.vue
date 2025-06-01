@@ -21,6 +21,7 @@
 
 <script>
 import axios from 'axios'
+import bcrypt from 'bcryptjs'  // Add bcrypt import
 import { API_ENDPOINTS } from '@/utils/api.js'
 import LoginCard from '@/components/layout/LoginCard.vue'
 import LoginForm from '@/components/auth/LoginForm.vue'
@@ -57,9 +58,10 @@ export default {
       this.loading = true
       
       try {
+        
         const response = await axios.post(API_ENDPOINTS.LOGIN, {
           email: formData.email,
-          password: formData.password
+          password: formData.password  // Send hashed password
         })
         
         // Handle successful login

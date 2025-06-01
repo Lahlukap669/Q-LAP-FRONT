@@ -91,7 +91,7 @@ export default {
           return
         }
 
-        const response = await axios.get(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/periodizations`, {
+        const response = await axios.get(`${API_ENDPOINTS.TRAINER_PERIODIZATIONS}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

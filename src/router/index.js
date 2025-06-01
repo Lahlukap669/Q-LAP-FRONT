@@ -49,6 +49,16 @@ const router = createRouter({
       name: 'visualizations',
       component: () => import('../views/trainer/VisualizationsView.vue')
     },
+    {
+      path: '/trainer/add-athlete',
+      name: 'add-athlete',
+      component: () => import('../views/trainer/AddAthleteView.vue')
+    },
+    {
+      path: '/trainer/my-athletes',
+      name: 'my-athletes',
+      component: () => import('../views/trainer/MyAthletesView.vue'),
+    },
     
     // Athlete routes
     {

@@ -33,7 +33,7 @@ export default {
 }
 
 .header-bg {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
 }
 
 .form-content {

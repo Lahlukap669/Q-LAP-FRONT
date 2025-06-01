@@ -14,7 +14,7 @@
           <router-link to="/trainer" class="flex items-center hover:text-white/80 transition duration-200">
             <i class="fas fa-home mr-2"></i>Dashboard
           </router-link>
-          <router-link to="/trainer/athletes" class="flex items-center hover:text-white/80 transition duration-200">
+          <router-link to="/trainer/my-athletes" class="flex items-center hover:text-white/80 transition duration-200">
             <i class="fas fa-users mr-2"></i>Athletes
           </router-link>
           <router-link to="/trainer/analytics" class="flex items-center hover:text-white/80 transition duration-200">
@@ -76,7 +76,7 @@
               <span class="text-lg">Dashboard</span>
             </router-link>
             <router-link 
-              to="/trainer/athletes" 
+              to="/trainer/my-athletes" 
               @click="closeMobileNav"
               class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
             >
@@ -251,7 +251,7 @@ export default {
 
 /* Active Link Styling */
 .router-link-active {
-  color: #666666 !important;
+  color: #90baff !important;
 }
 
 /* Mobile specific styles */

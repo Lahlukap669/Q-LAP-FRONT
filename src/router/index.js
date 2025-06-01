@@ -30,11 +30,6 @@ const router = createRouter({
       component: () => import('../views/trainer/CreatePeriodizationView.vue')
     },
     {
-      path: '/trainer/periodization',
-      name: 'periodization',
-      component: () => import('../views/trainer/PeriodizationView.vue')
-    },
-    {
       path: '/trainer/tests',
       name: 'tests',
       component: () => import('../views/trainer/TestsView.vue')

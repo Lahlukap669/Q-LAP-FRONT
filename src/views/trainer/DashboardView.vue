@@ -104,14 +104,14 @@ export default {
         })
         
       } catch (error) {
-        console.error('Error fetching periodizations:', error)
+        console.error('Napaka pri pridobivanju ciklizacij:', error)
         
         if (error.response?.status === 401) {
           localStorage.removeItem('access_token')
           localStorage.removeItem('user')
           this.$router.push('/login')
         } else {
-          this.error = error.response?.data?.message || 'Failed to load periodizations'
+          this.error = error.response?.data?.message || 'Napaka pri nalaganju ciklizacij.'
         }
       } finally {
         this.loading = false

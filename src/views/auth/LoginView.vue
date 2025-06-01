@@ -85,9 +85,9 @@ export default {
         
       } catch (error) {
         // Handle login error
-        const errorMessage = error.response?.data?.message || 'Login failed. Please try again.'
-        this.showAlert('error', errorMessage)
-        console.error('Login error:', error)
+        const errorMessage = error.response?.data?.message || 'Prijava neuspešna. Poskusi ponovno.'
+        this.showAlert('Napaka:', errorMessage)
+        console.error('Napaka pri prijavi:', error)
       } finally {
         this.loading = false
       }

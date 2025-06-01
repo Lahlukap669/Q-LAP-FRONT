@@ -4,9 +4,9 @@
     <BaseInput
       id="email"
       type="email"
-      label="Username"
+      label="E-pošta"
       icon="fas fa-user"
-      placeholder="Enter your username"
+      placeholder="Vnesi svoj e-poštni naslov"
       v-model="form.email"
       :disabled="loading"
       required
@@ -16,9 +16,9 @@
     <BaseInput
       id="password"
       type="password"
-      label="Password"
+      label="Geslo"
       icon="fas fa-lock"
-      placeholder="Enter your password"
+      placeholder="Vnesi svoje geslo"
       v-model="form.password"
       :disabled="loading"
       required
@@ -31,7 +31,7 @@
       :loading="loading"
       :disabled="loading"
     >
-      {{ loading ? 'Logging in...' : 'Login' }}
+      {{ loading ? 'Prijavljanje...' : 'Prijava' }}
     </BaseButton>
   </form>
 </template>

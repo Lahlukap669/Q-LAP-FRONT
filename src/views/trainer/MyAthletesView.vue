@@ -73,7 +73,7 @@
           >
             <i v-if="deletingAthletes.includes(athlete.id)" class="fas fa-spinner fa-spin mr-2"></i>
             <i v-else class="fas fa-user-minus mr-2"></i>
-            {{ deletingAthletes.includes(athlete.id) ? 'Deleting...' : 'Odstrani' }}
+            {{ deletingAthletes.includes(athlete.id) ? 'Brisanje...' : 'Odstrani' }}
           </button>
         </div>
 
@@ -161,14 +161,14 @@ export default {
           localStorage.removeItem('user')
           this.$router.push('/login')
         } else {
-          this.error = error.response?.data?.message || 'Failed to load athletes'
+          this.error = error.response?.data?.message || 'Napaka pri nalaganju športnikov.'
         }
       } finally {
         this.loading = false
       }
     },
     async deleteAthlete(athlete) {
-      if (!confirm(`Are you sure you want to delete ${athlete.first_name} ${athlete.last_name}?`)) {
+      if (!confirm(`Si prepričan, da želiš izbrisati ${athlete.first_name} ${athlete.last_name}?`)) {
         return
       }
       
@@ -181,11 +181,11 @@ export default {
             'Content-Type': 'application/json'
           }
         })
-        this.showAlert('success', `${athlete.first_name} ${athlete.last_name} has been deleted.`)
+        this.showAlert('success', `${athlete.first_name} ${athlete.last_name} Je bil izbrisan.`)
         this.athletes = this.athletes.filter(a => a.id !== athlete.id)
       } catch (error) {
         console.error('Error deleting athlete:', error)
-        this.showAlert('error', error.response?.data?.message || 'Failed to delete athlete')
+        this.showAlert('error', error.response?.data?.message || 'Napaka pri brisanju športnika.')
       } finally {
         this.deletingAthletes = this.deletingAthletes.filter(id => id !== athlete.id)
       }

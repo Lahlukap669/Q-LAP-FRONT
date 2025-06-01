@@ -189,7 +189,7 @@
           >
             <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
             <i v-else class="fas fa-save mr-2"></i>
-            {{ loading ? 'Saving...' : 'SHRANI CIKLIZACIJO' }}
+            {{ loading ? 'Shranjevanje...' : 'SHRANI CIKLIZACIJO' }}
           </button>
           
           <button 
@@ -310,8 +310,8 @@ export default {
         })
         this.trainingMethods = response.data.methods || []
       } catch (error) {
-        console.error('Error fetching training methods:', error)
-        this.showAlert('error', 'Failed to load training methods')
+        console.error('Napaka pri pridobivanju metod treninga:', error)
+        this.showAlert('error', 'Napaka pri nalaganju metod treninga.')
       }
     },
 
@@ -395,8 +395,8 @@ export default {
         }, 1500)
 
       } catch (error) {
-        console.error('Error creating periodization:', error)
-        const errorMessage = error.response?.data?.message || 'Failed to create periodization'
+        console.error('Napaka pri ustvarjanju ciklizacije:', error)
+        const errorMessage = error.response?.data?.message || 'Napaka pri ustvarjanju ciklizacije'
         this.showAlert('error', errorMessage)
       } finally {
         this.loading = false
@@ -404,7 +404,7 @@ export default {
     },
 
     cancelCreation() {
-      if (confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
+      if (confirm('Ali si prepričan, da želiš nadaljevati? Vse neshranjene spremembe bodo izgubljene.')) {
         this.$router.push('/trainer')
       }
     },

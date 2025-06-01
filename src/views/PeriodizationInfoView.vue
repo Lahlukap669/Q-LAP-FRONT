@@ -366,7 +366,7 @@ export default {
           localStorage.removeItem('user')
           this.$router.push('/login')
         } else {
-          this.error = error.response?.data?.message || 'Failed to load periodization information'
+          this.error = error.response?.data?.message || 'Napaka pri nalaganju vsebine ciklizacije.'
         }
       } finally {
         this.loading = false

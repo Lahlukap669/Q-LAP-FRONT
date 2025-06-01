@@ -86,7 +86,7 @@
           >
             <i v-if="addingAthletes.includes(athlete.id)" class="fas fa-spinner fa-spin mr-2"></i>
             <i v-else class="fas fa-user-plus mr-2"></i>
-            {{ addingAthletes.includes(athlete.id) ? 'Adding...' : 'Dodaj športnika' }}
+            {{ addingAthletes.includes(athlete.id) ? 'Dodajanje...' : 'Dodaj športnika' }}
           </button>
         </div>
 
@@ -95,7 +95,7 @@
           <i class="fas fa-users text-6xl text-gray-400 mb-4"></i>
           <h3 class="text-xl font-bold text-gray-700 mb-2">Ni bilo najdenih špornikov.</h3>
           <p class="text-gray-500 mb-6">
-            {{ searchQuery ? 'Try adjusting your search criteria.' : 'No athletes available to add.' }}
+            {{ searchQuery ? 'Poskusi dodati kriterije za iskanje športnika.' : 'Ni razpoložljivih športnikov za dodajanje.' }}
           </p>
           <button v-if="searchQuery" @click="clearSearch" class="clear-button px-6 py-3 rounded-lg font-semibold transition duration-200">
             <i class="fas fa-times mr-2"></i>Počisti iskalnik

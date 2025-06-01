@@ -10,12 +10,22 @@
     <main class="container mx-auto px-4 py-6">
       <!-- Welcome Section -->
       <div class="welcome-section rounded-xl p-8 mb-8">
-        <h2 class="text-3xl font-bold text-white mb-2">
-          My Athletes
-        </h2>
-        <p class="text-white/90 text-lg">
-          Manage your athletes here.
-        </p>
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-3xl font-bold text-white mb-2">
+              My Athlete
+            </h2>
+            <p class="text-white/90 text-lg">
+              See your athletes.
+            </p>
+          </div>
+          <button 
+            @click="goToAddAthlete" 
+            class="forward-button px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center"
+          >
+            <i class="fas fa-arrow-right mr-2"></i>Add athlete
+          </button>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -236,6 +246,12 @@ export default {
 .retry-button {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
+}
+
+.forward-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .retry-button:hover {

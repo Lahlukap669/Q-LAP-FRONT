@@ -11,7 +11,7 @@ export default {
   props: {
     message: {
       type: String,
-      default: 'Loading...'
+      default: 'Nalaganje...'
     }
   }
 }

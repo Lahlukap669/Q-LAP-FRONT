@@ -23,7 +23,7 @@
             @click="goToAddAthlete" 
             class="forward-button px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center"
           >
-            <i class="fas fa-arrow-right mr-2"></i>Add athlete
+            <i class="fas fa-arrow-right mr-2"></i>Dodaj športnika
           </button>
         </div>
       </div>
@@ -31,16 +31,16 @@
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <i class="fas fa-spinner fa-spin text-4xl text-white mb-4"></i>
-        <p class="text-white text-lg">Loading athletes...</p>
+        <p class="text-white text-lg">Nalaganje športnikov...</p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="error-card rounded-xl p-8 text-center">
         <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Error Loading Athletes</h3>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Napaka pri nalaganju športnikov.</h3>
         <p class="text-gray-600 mb-4">{{ error }}</p>
         <button @click="fetchAthletes" class="retry-button px-6 py-3 rounded-lg font-semibold transition duration-200">
-          <i class="fas fa-redo mr-2"></i>Try Again
+          <i class="fas fa-redo mr-2"></i>Poskusi ponovno
         </button>
       </div>
 
@@ -73,17 +73,17 @@
           >
             <i v-if="deletingAthletes.includes(athlete.id)" class="fas fa-spinner fa-spin mr-2"></i>
             <i v-else class="fas fa-user-minus mr-2"></i>
-            {{ deletingAthletes.includes(athlete.id) ? 'Deleting...' : 'Delete' }}
+            {{ deletingAthletes.includes(athlete.id) ? 'Deleting...' : 'Odstrani' }}
           </button>
         </div>
 
         <!-- Empty State -->
         <div v-if="athletes.length === 0 && !loading" class="empty-state rounded-xl p-12 text-center">
           <i class="fas fa-users text-6xl text-gray-400 mb-4"></i>
-          <h3 class="text-xl font-bold text-gray-700 mb-2">No Athletes Found</h3>
-          <p class="text-gray-500 mb-6">You have no athletes added yet.</p>
+          <h3 class="text-xl font-bold text-gray-700 mb-2">Športniki niso bili najdeni.</h3>
+          <p class="text-gray-500 mb-6">Nimaš še dodanih športnikov.</p>
           <button @click="goToAddAthlete" class="create-button px-6 py-3 rounded-lg font-semibold transition duration-200 inline-flex items-center">
-            <i class="fas fa-plus mr-2 text-sm"></i>Add Athlete
+            <i class="fas fa-plus mr-2 text-sm"></i>Dodaj špornika
           </button>
         </div>
       </div>

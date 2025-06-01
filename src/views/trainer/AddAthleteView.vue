@@ -13,17 +13,17 @@
         <div class="flex justify-between items-center">
           <div>
             <h2 class="text-3xl font-bold text-white mb-2">
-              Add Athlete
+              Dodaj športnika
             </h2>
             <p class="text-white/90 text-lg">
-              Search and add athletes to your training programs.
+              Išči in dodaj športnike za svoje ciklizacije.
             </p>
           </div>
           <button 
             @click="goToMyAthletes" 
             class="back-button px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center"
           >
-            <i class="fas fa-arrow-left mr-2"></i>Back to My Athletes
+            <i class="fas fa-arrow-left mr-2"></i>Nazaj na moje špornike
           </button>
         </div>
       </div>
@@ -36,7 +36,7 @@
             type="text" 
             v-model="searchQuery"
             @input="debouncedSearch"
-            placeholder="Search athletes by name or email..." 
+            placeholder="Išči športnika po imenu ali e-pošti..." 
             class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
           >
         </div>
@@ -45,16 +45,16 @@
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <i class="fas fa-spinner fa-spin text-4xl text-white mb-4"></i>
-        <p class="text-white text-lg">Loading athletes...</p>
+        <p class="text-white text-lg">Nalagam športnike</p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="error-card rounded-xl p-8 text-center">
         <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Error Loading Athletes</h3>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Napaka pri nalaganju športnikov</h3>
         <p class="text-gray-600 mb-4">{{ error }}</p>
         <button @click="fetchAthletes" class="retry-button px-6 py-3 rounded-lg font-semibold transition duration-200">
-          <i class="fas fa-redo mr-2"></i>Try Again
+          <i class="fas fa-redo mr-2"></i>Poskusi ponovno
         </button>
       </div>
 
@@ -86,19 +86,19 @@
           >
             <i v-if="addingAthletes.includes(athlete.id)" class="fas fa-spinner fa-spin mr-2"></i>
             <i v-else class="fas fa-user-plus mr-2"></i>
-            {{ addingAthletes.includes(athlete.id) ? 'Adding...' : 'Add Athlete' }}
+            {{ addingAthletes.includes(athlete.id) ? 'Adding...' : 'Dodaj športnika' }}
           </button>
         </div>
 
         <!-- Empty State -->
         <div v-if="filteredAthletes.length === 0 && !loading" class="empty-state rounded-xl p-12 text-center">
           <i class="fas fa-users text-6xl text-gray-400 mb-4"></i>
-          <h3 class="text-xl font-bold text-gray-700 mb-2">No Athletes Found</h3>
+          <h3 class="text-xl font-bold text-gray-700 mb-2">Ni bilo najdenih špornikov.</h3>
           <p class="text-gray-500 mb-6">
             {{ searchQuery ? 'Try adjusting your search criteria.' : 'No athletes available to add.' }}
           </p>
           <button v-if="searchQuery" @click="clearSearch" class="clear-button px-6 py-3 rounded-lg font-semibold transition duration-200">
-            <i class="fas fa-times mr-2"></i>Clear Search
+            <i class="fas fa-times mr-2"></i>Počisti iskalnik
           </button>
         </div>
       </div>

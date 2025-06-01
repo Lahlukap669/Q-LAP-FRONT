@@ -12,7 +12,7 @@
       <WelcomeSection />
 
       <!-- Loading State -->
-      <LoadingSpinner v-if="loading" message="Loading periodizations..." />
+      <LoadingSpinner v-if="loading" message="Nalaganje ciklizacij ..." />
 
       <!-- Error State -->
       <ErrorMessage 
@@ -133,7 +133,7 @@ export default {
     },
     
     viewPeriodization(id) {
-      this.$router.push(`/trainer/periodization/${id}`)
+      this.$router.push(`/periodization-info/${id}`)
     },
     
     createPeriodization() {

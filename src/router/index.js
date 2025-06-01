@@ -66,12 +66,17 @@ const router = createRouter({
       name: 'athlete-dashboard',
       component: () => import('../views/athlete/DashboardView.vue')
     },
-    
+
     // Shared routes
     {
       path: '/settings',
       name: 'settings',
       component: () => import('../views/SettingsView.vue')
+    },
+    {
+      path: '/periodization-info/:id',
+      name: 'periodization-info',
+      component: () => import('../views/PeriodizationInfoView.vue')
     }
   ]
 })

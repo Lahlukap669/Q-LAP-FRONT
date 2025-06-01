@@ -12,16 +12,16 @@
         <!-- Desktop Navigation -->
         <nav class="hidden lg:flex items-center space-x-6 text-white">
           <router-link to="/trainer" class="flex items-center hover:text-white/80 transition duration-200">
-            <i class="fas fa-home mr-2"></i>Dashboard
+            <i class="fas fa-home mr-2"></i>Nadzorna plošča
           </router-link>
           <router-link to="/trainer/my-athletes" class="flex items-center hover:text-white/80 transition duration-200">
-            <i class="fas fa-users mr-2"></i>Athletes
+            <i class="fas fa-users mr-2"></i>Športniki
           </router-link>
           <router-link to="/trainer/analytics" class="flex items-center hover:text-white/80 transition duration-200">
-            <i class="fas fa-chart-line mr-2"></i>Analytics
+            <i class="fas fa-chart-line mr-2"></i>Analitika
           </router-link>
           <router-link to="/trainer/tests" class="flex items-center hover:text-white/80 transition duration-200">
-            <i class="fas fa-flask mr-2"></i>Tests
+            <i class="fas fa-flask mr-2"></i>Testi
           </router-link>
         </nav>
 
@@ -36,14 +36,14 @@
           <!-- User Dropdown Menu -->
           <div v-if="showUserMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
             <router-link to="/trainer/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-              <i class="fas fa-user mr-2"></i>Profile
+              <i class="fas fa-user mr-2"></i>Profil
             </router-link>
             <router-link to="/trainer/settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-              <i class="fas fa-cog mr-2"></i>Settings
+              <i class="fas fa-cog mr-2"></i>Nastavitve
             </router-link>
             <hr class="my-1">
             <button @click="handleLogout" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition duration-200">
-              <i class="fas fa-sign-out-alt mr-2"></i>Logout
+              <i class="fas fa-sign-out-alt mr-2"></i>Odjava
             </button>
           </div>
         </div>
@@ -73,7 +73,7 @@
               class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
             >
               <i class="fas fa-home mr-4 text-lg"></i>
-              <span class="text-lg">Dashboard</span>
+              <span class="text-lg">Nadzorna plošča</span>
             </router-link>
             <router-link 
               to="/trainer/my-athletes" 
@@ -81,7 +81,7 @@
               class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
             >
               <i class="fas fa-users mr-4 text-lg"></i>
-              <span class="text-lg">Athletes</span>
+              <span class="text-lg">Športniki</span>
             </router-link>
             <router-link 
               to="/trainer/analytics" 
@@ -89,7 +89,7 @@
               class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
             >
               <i class="fas fa-chart-line mr-4 text-lg"></i>
-              <span class="text-lg">Analytics</span>
+              <span class="text-lg">Analitika</span>
             </router-link>
             <router-link 
               to="/trainer/tests" 
@@ -97,7 +97,7 @@
               class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
             >
               <i class="fas fa-flask mr-4 text-lg"></i>
-              <span class="text-lg">Tests</span>
+              <span class="text-lg">Testi</span>
             </router-link>
           </div>
 
@@ -115,7 +115,7 @@
                 class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
               >
                 <i class="fas fa-user mr-4 text-lg"></i>
-                <span class="text-lg">Profile</span>
+                <span class="text-lg">Profil</span>
               </router-link>
               <router-link 
                 to="/trainer/settings" 
@@ -123,14 +123,14 @@
                 class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
               >
                 <i class="fas fa-cog mr-4 text-lg"></i>
-                <span class="text-lg">Settings</span>
+                <span class="text-lg">Nastavitve</span>
               </router-link>
               <button 
                 @click="handleLogout" 
                 class="flex items-center w-full text-red-600 hover:text-red-700 hover:bg-red-50 py-3 px-4 rounded-lg transition duration-200"
               >
                 <i class="fas fa-sign-out-alt mr-4 text-lg"></i>
-                <span class="text-lg">Logout</span>
+                <span class="text-lg">Odjava</span>
               </button>
             </div>
           </div>

@@ -21,7 +21,7 @@
     <!-- Progress Section -->
     <div class="mb-6">
       <div class="flex justify-between items-center mb-2">
-        <span class="text-sm font-semibold text-gray-700">Progress</span>
+        <span class="text-sm font-semibold text-gray-700">Napredek</span>
         <span class="text-sm font-bold text-gray-700">{{ periodization.progress }}%</span>
       </div>
       <div class="progress-bg rounded-full h-3">

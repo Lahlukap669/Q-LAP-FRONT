@@ -294,8 +294,8 @@ export default {
         })
         this.athletes = response.data.athletes || []
       } catch (error) {
-        console.error('Error fetching athletes:', error)
-        this.showAlert('error', 'Failed to load athletes')
+        console.error('Napaka pri nalaganju športnikov:', error)
+        this.showAlert('error', 'Ni mogoče naložiti podatkov športnikov')
       }
     },
 

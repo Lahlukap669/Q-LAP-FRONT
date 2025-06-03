@@ -54,6 +54,11 @@ const router = createRouter({
       name: 'my-athletes',
       component: () => import('../views/trainer/MyAthletesView.vue'),
     },
+    {
+      path: '/trainer/microcycle/:microcycleId/:dayOfWeek?',
+      name: 'microcycle-info',
+      component: () => import('../views/trainer/MicrocycleInfoView.vue')
+    },
     
     // Athlete routes
     {

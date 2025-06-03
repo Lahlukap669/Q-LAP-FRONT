@@ -58,13 +58,15 @@
         <div class="timeline-card">
           <h3 class="section-title">Časovni potek ciklizacije</h3>
           
-          <!-- Week Blocks -->
+          <!-- Week Blocks - NOW CLICKABLE -->
           <div class="week-blocks-container">
             <div 
               v-for="(week, index) in allWeeks" 
               :key="index"
               class="week-block"
               :class="getWeekBlockClass(week, index + 1)"
+              @click="navigateToMicrocycle(week, index + 1)"
+              :title="`Klikni za ogled mikrocikel ${week.microcycle?.id || 'N/A'}`"
             >
               <!-- Competition Week: Show both number and crown -->
               <div v-if="index + 1 === totalWeeks" class="competition-content">
@@ -327,6 +329,29 @@ export default {
         message: message
       }
     },
+
+    // NEW METHOD: Navigate to microcycle
+    navigateToMicrocycle(week, weekNumber) {
+      // Check if it's the competition week
+      if (weekNumber === this.totalWeeks) {
+        this.showAlert('info', 'To je teden tekmovanja - ni povezan z mikrociklom.')
+        return
+      }
+
+      // Check if microcycle exists and has an ID
+      if (!week.microcycle || !week.microcycle.id) {
+        this.showAlert('error', 'Mikrocikel ID ni na voljo.')
+        return
+      }
+
+      // Navigate to microcycle route
+      const microcycleId = week.microcycle.id
+      this.$router.push(`/trainer/microcycle/${microcycleId}/1`)
+        .catch(err => {
+          console.error('Navigation error:', err)
+          this.showAlert('error', 'Napaka pri navigaciji na mikrocikel.')
+        })
+    },
     
     async fetchPeriodizationInfo() {
       this.loading = true
@@ -440,6 +465,25 @@ export default {
 </script>
 
 <style scoped>
+.week-block {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 16px;
+  cursor: pointer; /* Already there */
+  transition: all 0.3s ease;
+  user-select: none; /* Prevent text selection */
+}
+
+.week-block:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Enhanced hover effect */
+}
 /* Main Background */
 .periodization-bg {
   background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);

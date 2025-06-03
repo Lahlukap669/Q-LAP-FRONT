@@ -11,7 +11,7 @@
       <!-- Page Title -->
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-white mb-2">
-          <i class="fas fa-plus-circle mr-3"></i>USTVARI CIKLIZACIJO
+          <i class="fas fa-plus-circle mr-3"></i>CREATE PERIODIZATION
         </h1>
       </div>
 
@@ -19,17 +19,17 @@
       <div class="space-y-6">
         <!-- Basic Information -->
         <div class="form-section rounded-xl p-6">
-          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Osnovne informacije</h3>
+          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Basic Information</h3>
           
           <!-- Periodization Name -->
           <div class="mb-6">
             <label class="block text-gray-700 font-medium mb-2">
-              <i class="fas fa-tag mr-2 text-blue-500"></i>Ime ciklizacije
+              <i class="fas fa-tag mr-2 text-blue-500"></i>Periodization Name
             </label>
             <input 
               type="text" 
               v-model="form.periodization_name"
-              placeholder="Dodaj ime ciklizacije. Odlično, če izbereš ime vezano na disciplino športa."
+              placeholder="Enter periodization name"
               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
             >
           </div>
@@ -37,7 +37,7 @@
           <!-- Difficulty Slider -->
           <div class="mb-6">
             <label class="block text-gray-700 font-medium mb-2">
-              <i class="fas fa-signal mr-2 text-blue-500"></i>Težavnost (1-10)
+              <i class="fas fa-signal mr-2 text-blue-500"></i>Difficulty (1-10)
             </label>
             <div class="flex items-center space-x-4">
               <span class="text-sm text-gray-600">1</span>
@@ -58,11 +58,11 @@
 
         <!-- Mesocycles Configuration -->
         <div class="form-section rounded-xl p-6">
-          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Konfiguracija mezociklov</h3>
+          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Mesocycles Configuration</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
             <div v-for="(weeks, index) in form.mesocycle_lengths" :key="index" class="text-center relative">
-              <label class="block text-gray-700 font-medium mb-2">Mezocikel {{ index + 1 }}</label>
+              <label class="block text-gray-700 font-medium mb-2">Mesocycle {{ index + 1 }}</label>
               <input 
                 type="number" 
                 v-model="form.mesocycle_lengths[index]"
@@ -84,23 +84,23 @@
           <div class="text-center">
             <button 
               @click="addMesocycle"
-              :disabled="form.mesocycle_lengths.length >= 6"
+              :disabled="form.mesocycle_lengths.length >= 20"
               class="add-mesocycle-btn px-6 py-3 rounded-lg font-semibold transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <i class="fas fa-plus mr-2"></i>Dodaj mezocikel
+              <i class="fas fa-plus mr-2"></i>Add Mesocycle
             </button>
           </div>
         </div>
 
         <!-- Competition & Athlete -->
         <div class="form-section rounded-xl p-6">
-          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Tekmovanje in atlet</h3>
+          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Competition & Athlete</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Competition Date -->
             <div>
               <label class="block text-gray-700 font-medium mb-2">
-                <i class="fas fa-calendar mr-2 text-blue-500"></i>Dan glavnega tekmovanja
+                <i class="fas fa-calendar mr-2 text-blue-500"></i>Competition Day
               </label>
               <input 
                 type="date" 
@@ -111,12 +111,12 @@
 
             <!-- Select Athlete -->
             <div>
-              <label class="block text-gray-700 font-medium mb-2">Izberi športnika</label>
+              <label class="block text-gray-700 font-medium mb-2">Select Athlete</label>
               <select 
                 v-model="form.athlete_id"
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
               >
-                <option value="">Izberi športnika ...</option>
+                <option value="">Choose an athlete...</option>
                 <option 
                   v-for="athlete in athletes" 
                   :key="athlete.id" 
@@ -131,50 +131,67 @@
 
         <!-- Training Methods Selection -->
         <div class="form-section rounded-xl p-6">
-          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Izbira metod treninga</h3>
-          <p class="text-gray-600 mb-4">Izberi do 2 metodi z enako podkategorijo gibalne sposobnosti in maksimalno 3 različne podkategorije</p>
+          <h3 class="section-title text-xl font-bold text-gray-800 mb-4">Training Methods Selection</h3>
+          <p class="text-gray-600 mb-4">Select 1 method per motor ability, up to 4 different motor abilities per mesocycle</p>
 
           <div class="overflow-x-auto">
             <table class="w-full border border-gray-300 rounded-lg overflow-hidden">
               <thead>
                 <tr class="methods-header">
-                  <th class="p-3 text-left font-semibold">Metode</th>
+                  <th class="p-3 text-left font-semibold">Methods</th>
                   <th 
                     v-for="(_, index) in form.mesocycle_lengths" 
                     :key="index"
                     class="p-3 text-center font-semibold"
                   >
-                    Mezo {{ index + 1 }}
+                    Meso {{ index + 1 }}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="method in trainingMethods" :key="method.id" class="border-t hover:bg-gray-50">
-                  <td class="p-3 font-medium text-gray-800">
-                    <div class="flex items-center space-x-2">
-                      <span>{{ method.method_name }}</span>
-                      <button 
-                        @click="showMethodInfo(method)"
-                        class="info-button w-5 h-5 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600 transition duration-200"
+                <template v-for="(ability, abilityIdx) in trainingMethods" :key="'ability-' + abilityIdx">
+                  <!-- Motor Ability Title -->
+                  <tr>
+                    <td :colspan="form.mesocycle_lengths.length + 1" class="bg-blue-50 font-bold text-2xl py-4 text-blue-900">
+                      {{ ability.motor_ability }}
+                    </td>
+                  </tr>
+                  <template v-for="(group, groupIdx) in ability.method_groups" :key="'group-' + abilityIdx + '-' + groupIdx">
+                    <!-- Method Group Title -->
+                    <tr>
+                      <td :colspan="form.mesocycle_lengths.length + 1" class="bg-blue-100 font-semibold text-lg py-3 text-blue-700 pl-8">
+                        {{ group.group_name }}
+                      </td>
+                    </tr>
+                    <!-- Methods -->
+                    <tr v-for="method in group.methods" :key="method.id" class="border-t hover:bg-gray-50">
+                      <td class="p-3 font-medium text-gray-800 pl-14">
+                        <div class="flex items-center space-x-2">
+                          <span>{{ method.name }}</span>
+                          <button 
+                            @click="showMethodInfo(method)"
+                            class="info-button w-5 h-5 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600 transition duration-200"
+                          >
+                            i
+                          </button>
+                        </div>
+                      </td>
+                      <td 
+                        v-for="(_, mesoIndex) in form.mesocycle_lengths" 
+                        :key="mesoIndex"
+                        class="p-3 text-center"
                       >
-                        i
-                      </button>
-                    </div>
-                  </td>
-                  <td 
-                    v-for="(_, mesoIndex) in form.mesocycle_lengths" 
-                    :key="mesoIndex"
-                    class="p-3 text-center"
-                  >
-                    <input 
-                      type="checkbox" 
-                      :checked="isMethodSelected(method.id, mesoIndex)"
-                      @change="toggleMethod(method.id, mesoIndex)"
-                      :disabled="getSelectedMethodsCount(mesoIndex) >= 3 && !isMethodSelected(method.id, mesoIndex)"
-                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                    >
-                  </td>
-                </tr>
+                        <input 
+                          type="checkbox" 
+                          :checked="isMethodSelected(method.id, mesoIndex)"
+                          @change="toggleMethod(method.id, mesoIndex, ability.motor_ability)"
+                          :disabled="isMethodDisabled(method.id, mesoIndex, ability.motor_ability)"
+                          class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        >
+                      </td>
+                    </tr>
+                  </template>
+                </template>
               </tbody>
             </table>
           </div>
@@ -189,7 +206,7 @@
           >
             <i v-if="loading" class="fas fa-spinner fa-spin mr-2"></i>
             <i v-else class="fas fa-save mr-2"></i>
-            {{ loading ? 'Shranjevanje...' : 'SHRANI CIKLIZACIJO' }}
+            {{ loading ? 'Saving...' : 'SAVE PERIODIZATION' }}
           </button>
           
           <button 
@@ -197,7 +214,7 @@
             :disabled="loading"
             class="cancel-btn px-8 py-4 rounded-xl font-bold text-lg transition duration-300 disabled:opacity-50"
           >
-            <i class="fas fa-times mr-2"></i>PREKLIČI
+            <i class="fas fa-times mr-2"></i>CANCEL
           </button>
         </div>
       </div>
@@ -207,10 +224,9 @@
     <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl max-w-md w-full p-6">
         <div class="flex justify-between items-start mb-4">
-          <h1 class="text-2xl font-bold text-gray-800">{{ selectedMethod.method_name }}</h1>
+          <h1 class="text-2xl font-bold text-gray-800">{{ selectedMethod.name }}</h1>
           <button @click="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
         </div>
-        <h2 class="text-lg font-semibold text-blue-600 mb-3">{{ selectedMethod.method_group }}</h2>
         <p class="text-gray-700 leading-relaxed">{{ selectedMethod.description }}</p>
       </div>
     </div>
@@ -294,8 +310,8 @@ export default {
         })
         this.athletes = response.data.athletes || []
       } catch (error) {
-        console.error('Napaka pri nalaganju športnikov:', error)
-        this.showAlert('error', 'Ni mogoče naložiti podatkov športnikov')
+        console.error('Error fetching athletes:', error)
+        this.showAlert('error', 'Failed to load athletes')
       }
     },
 
@@ -308,15 +324,15 @@ export default {
             'Content-Type': 'application/json'
           }
         })
-        this.trainingMethods = response.data.methods || []
+        this.trainingMethods = response.data.data || []
       } catch (error) {
-        console.error('Napaka pri pridobivanju metod treninga:', error)
-        this.showAlert('error', 'Napaka pri nalaganju metod treninga.')
+        console.error('Error fetching training methods:', error)
+        this.showAlert('error', 'Failed to load training methods')
       }
     },
 
     addMesocycle() {
-      if (this.form.mesocycle_lengths.length < 6) {
+      if (this.form.mesocycle_lengths.length < 20) {
         this.form.mesocycle_lengths.push(4)
         this.form.selected_methods.push([])
       }
@@ -347,7 +363,61 @@ export default {
       return this.form.selected_methods[mesoIndex]?.length || 0
     },
 
-    toggleMethod(methodId, mesoIndex) {
+    getSelectedMotorAbilities(mesoIndex) {
+      const selectedMethods = this.form.selected_methods[mesoIndex] || []
+      const motorAbilities = new Set()
+      
+      selectedMethods.forEach(methodId => {
+        for (const ability of this.trainingMethods) {
+          for (const group of ability.method_groups) {
+            if (group.methods.find(method => method.id === methodId)) {
+              motorAbilities.add(ability.motor_ability)
+              break
+            }
+          }
+        }
+      })
+      
+      return Array.from(motorAbilities)
+    },
+
+    hasMethodFromMotorAbility(mesoIndex, motorAbility) {
+      const selectedMethods = this.form.selected_methods[mesoIndex] || []
+      
+      for (const methodId of selectedMethods) {
+        const ability = this.trainingMethods.find(a => a.motor_ability === motorAbility)
+        if (ability) {
+          for (const group of ability.method_groups) {
+            if (group.methods.find(method => method.id === methodId)) {
+              return true
+            }
+          }
+        }
+      }
+      return false
+    },
+
+    isMethodDisabled(methodId, mesoIndex, motorAbility) {
+      // If this method is already selected, it's not disabled
+      if (this.isMethodSelected(methodId, mesoIndex)) {
+        return false
+      }
+
+      // Check if we already have 4 different motor abilities selected
+      const selectedMotorAbilities = this.getSelectedMotorAbilities(mesoIndex)
+      if (selectedMotorAbilities.length >= 3 && !selectedMotorAbilities.includes(motorAbility)) {
+        return true
+      }
+
+      // Check if we already have a method from this motor ability
+      if (this.hasMethodFromMotorAbility(mesoIndex, motorAbility)) {
+        return true
+      }
+
+      return false
+    },
+
+    toggleMethod(methodId, mesoIndex, motorAbility) {
       if (!this.form.selected_methods[mesoIndex]) {
         this.$set(this.form.selected_methods, mesoIndex, [])
       }
@@ -356,9 +426,16 @@ export default {
       const index = methods.indexOf(methodId)
 
       if (index > -1) {
+        // Remove method
         methods.splice(index, 1)
-      } else if (methods.length < 3) {
-        methods.push(methodId)
+      } else {
+        // Add method only if rules allow
+        const selectedMotorAbilities = this.getSelectedMotorAbilities(mesoIndex)
+        
+        // Check if we can add this method
+        if (selectedMotorAbilities.length < 4 && !this.hasMethodFromMotorAbility(mesoIndex, motorAbility)) {
+          methods.push(methodId)
+        }
       }
     },
 
@@ -395,8 +472,8 @@ export default {
         }, 1500)
 
       } catch (error) {
-        console.error('Napaka pri ustvarjanju ciklizacije:', error)
-        const errorMessage = error.response?.data?.message || 'Napaka pri ustvarjanju ciklizacije'
+        console.error('Error creating periodization:', error)
+        const errorMessage = error.response?.data?.message || 'Failed to create periodization'
         this.showAlert('error', errorMessage)
       } finally {
         this.loading = false
@@ -404,7 +481,7 @@ export default {
     },
 
     cancelCreation() {
-      if (confirm('Ali si prepričan, da želiš nadaljevati? Vse neshranjene spremembe bodo izgubljene.')) {
+      if (confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
         this.$router.push('/trainer')
       }
     },

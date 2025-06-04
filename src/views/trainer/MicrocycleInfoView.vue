@@ -7,61 +7,69 @@
     />
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex items-center justify-center min-h-screen">
+    <div v-if="loading && !headerMounted" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
         <i class="fas fa-spinner fa-spin text-4xl text-white mb-4"></i>
-        <p class="text-white text-lg">Loading microcycle...</p>
+        <p class="text-white text-lg">Nalaganje mikrocikla...</p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="flex items-center justify-center min-h-screen">
+    <div v-else-if="error && !headerMounted" class="flex items-center justify-center min-h-screen">
       <div class="text-center bg-white rounded-xl p-8 mx-4">
         <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Error Loading Microcycle</h3>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Napaka pri nalaganju mikrocikla</h3>
         <p class="text-gray-600 mb-4">{{ error }}</p>
         <button @click="fetchMicrocycleInfo" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-200">
-          <i class="fas fa-redo mr-2"></i>Try Again
+          <i class="fas fa-redo mr-2"></i>Poskusi ponovno
         </button>
       </div>
     </div>
 
     <!-- Main Content -->
     <div v-else class="container mx-auto px-4 py-6">
-      <!-- Today Header -->
-      <div class="today-header rounded-xl p-6 mb-6">
+      <!-- Exercise Date Header with Day Selection -->
+      <div class="exercise-date-header rounded-xl p-6 mb-6">
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <i class="fas fa-calendar text-2xl text-white"></i>
-            <h1 class="text-2xl font-bold text-white">TODAY</h1>
+          <div class="flex items-center space-x-6">
+            <!-- Exercise Date -->
+            <div class="flex items-center space-x-3">
+              <i class="fas fa-calendar text-2xl text-white"></i>
+              <h1 class="text-2xl font-bold text-white">{{ formattedExerciseDate }}</h1>
+            </div>
+            
+            <!-- Day Selector -->
+            <div class="flex items-center space-x-3">
+              <button @click="previousDay" :disabled="selectedDayOfWeek <= 1" class="nav-button" :class="{ 'opacity-50 cursor-not-allowed': selectedDayOfWeek <= 1 }">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              
+              <select 
+                v-model="selectedDayOfWeek" 
+                @change="onDayChange"
+                class="day-select-inline"
+              >
+                <option value="1">Ponedeljek</option>
+                <option value="2">Torek</option>
+                <option value="3">Sreda</option>
+                <option value="4">Četrtek</option>
+                <option value="5">Petek</option>
+                <option value="6">Sobota</option>
+                <option value="7">Nedelja</option>
+              </select>
+              
+              <button @click="nextDay" :disabled="selectedDayOfWeek >= 7" class="nav-button" :class="{ 'opacity-50 cursor-not-allowed': selectedDayOfWeek >= 7 }">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <button @click="previousDay" class="nav-button">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <button @click="nextDay" class="nav-button">
-              <i class="fas fa-chevron-right"></i>
-            </button>
+          
+          <!-- Loading indicator for day changes -->
+          <div v-if="loading && headerMounted" class="flex items-center text-white">
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            <span>Nalaganje...</span>
           </div>
         </div>
-      </div>
-
-      <!-- Day Selector -->
-      <div class="day-selector rounded-xl p-4 mb-6">
-        <label class="block text-white font-medium mb-2">Select Day:</label>
-        <select 
-          v-model="selectedDayOfWeek" 
-          @change="onDayChange"
-          class="day-select"
-        >
-          <option value="1">Monday</option>
-          <option value="2">Tuesday</option>
-          <option value="3">Wednesday</option>
-          <option value="4">Thursday</option>
-          <option value="5">Friday</option>
-          <option value="6">Saturday</option>
-          <option value="7">Sunday</option>
-        </select>
       </div>
 
       <!-- Exercises Table -->
@@ -69,20 +77,20 @@
         <!-- Table Header -->
         <div class="table-header grid grid-cols-12 gap-4 p-4">
           <div class="col-span-1"></div>
-          <div class="col-span-3 text-center font-semibold text-white">NAME</div>
-          <div class="col-span-1 text-center font-semibold text-white">SETS</div>
-          <div class="col-span-1 text-center font-semibold text-white">REPS</div>
-          <div class="col-span-1 text-center font-semibold text-white">BURDEN%</div>
+          <div class="col-span-3 text-center font-semibold text-white">VAJA</div>
+          <div class="col-span-1 text-center font-semibold text-white">SERIJE</div>
+          <div class="col-span-1 text-center font-semibold text-white">PONOVITVE</div>
+          <div class="col-span-1 text-center font-semibold text-white">OBREMENITEV %</div>
           <div class="col-span-1 text-center font-semibold text-white">VO2 MAX</div>
-          <div class="col-span-1 text-center font-semibold text-white">HR%</div>
-          <div class="col-span-1 text-center font-semibold text-white">REST(s)</div>
-          <div class="col-span-1 text-center font-semibold text-white">GROUP</div>
-          <div class="col-span-1 text-center font-semibold text-white">EDIT</div>
+          <div class="col-span-1 text-center font-semibold text-white">HR %</div>
+          <div class="col-span-1 text-center font-semibold text-white">POČITEK</div>
+          <div class="col-span-1 text-center font-semibold text-white">SKUPINA</div>
+          <div class="col-span-1 text-center font-semibold text-white">UREDI</div>
         </div>
 
         <!-- Exercise Rows -->
         <div class="exercise-rows">
-          <template v-for="method in microcycleInfo.methods" :key="method.method_id">
+          <template v-for="method in microcycleInfo?.methods || []" :key="method.method_id">
             <div 
               v-for="exercise in method.exercises" 
               :key="exercise.exercise_id"
@@ -93,9 +101,8 @@
                 <input 
                   type="checkbox" 
                   :checked="exercise.exercise_finished"
-                  @change="toggleExerciseFinished(exercise)"
                   class="exercise-checkbox"
-                >
+                  disabled>
               </div>
 
               <!-- Exercise Name with Info -->
@@ -111,22 +118,22 @@
 
               <!-- Method Parameters -->
               <div class="col-span-1 text-center parameter-value">
-                {{ method.method_parameters.sets || '-' }}
+                {{ method.method_parameters.sets || '/' }}
               </div>
               <div class="col-span-1 text-center parameter-value">
-                {{ method.method_parameters.repetitions || '-' }}
+                {{ method.method_parameters.repetitions || '/' }}
               </div>
               <div class="col-span-1 text-center parameter-value">
-                {{ method.method_parameters.burden_percentage_of_mvc || '-' }}%
+                {{ method.method_parameters.burden_percentage_of_mvc ? method.method_parameters.burden_percentage_of_mvc + ' %' : '/' }}
               </div>
               <div class="col-span-1 text-center parameter-value">
-                {{ method.method_parameters.vo2_max || '-' }}
+                {{ method.method_parameters.vo2_max ? method.method_parameters.vo2_max + ' %' : '/' }}
               </div>
               <div class="col-span-1 text-center parameter-value">
-                {{ method.method_parameters.hr_percentage || '-' }}%
+                {{ method.method_parameters.hr_percentage ? method.method_parameters.hr_percentage + ' %' : '/' }}
               </div>
               <div class="col-span-1 text-center parameter-value">
-                {{ method.method_parameters.rest_seconds || '-' }}
+                {{ ((Math.floor(method.method_parameters.rest_seconds/60)!==0) ? Math.floor(method.method_parameters.rest_seconds/60) + ' min ' : '') + ((method.method_parameters.rest_seconds % 60 !== 0) ? method.method_parameters.rest_seconds%60 + ' s' : '')  || '/' }}
               </div>
 
               <!-- Method Group -->
@@ -148,11 +155,11 @@
         </div>
 
         <!-- Empty State -->
-        <div v-if="!microcycleInfo.methods || microcycleInfo.methods.length === 0" class="empty-state">
+        <div v-if="!microcycleInfo?.methods || microcycleInfo.methods.length === 0" class="empty-state">
           <div class="text-center py-12">
             <i class="fas fa-dumbbell text-4xl text-white/50 mb-4"></i>
-            <h3 class="text-xl font-bold text-white mb-2">No Exercises</h3>
-            <p class="text-white/80">No exercises scheduled for this day.</p>
+            <h3 class="text-xl font-bold text-white mb-2">Na vaj.</h3>
+            <p class="text-white/80">Na ta dan ni predvidena nobena vaja.</p>
           </div>
         </div>
       </div>
@@ -170,7 +177,7 @@
         
         <div class="exercise-details">
           <div class="detail-row">
-            <span class="detail-label">Difficulty:</span>
+            <span class="detail-label">Težavnost:</span>
             <span class="detail-value">{{ selectedExercise.difficulty }}/10</span>
           </div>
           <div class="detail-row">
@@ -180,7 +187,7 @@
         </div>
 
         <div class="exercise-description">
-          <h3 class="description-title">Description</h3>
+          <h3 class="description-title">Opis</h3>
           <p class="description-text">{{ selectedExercise.description }}</p>
         </div>
       </div>
@@ -216,6 +223,7 @@ export default {
       selectedDayOfWeek: 1,
       showModal: false,
       selectedExercise: {},
+      headerMounted: false,
       alert: {
         show: false,
         type: 'info',
@@ -230,6 +238,25 @@ export default {
     },
     microcycleId() {
       return this.$route.params.microcycleId
+    },
+    formattedExerciseDate() {
+      if (!this.microcycleInfo?.methods || this.microcycleInfo.methods.length === 0) {
+        return 'Ni datuma'
+      }
+      
+      // Get the exercise date from the first exercise
+      const firstMethod = this.microcycleInfo.methods[0]
+      if (firstMethod.exercises && firstMethod.exercises.length > 0) {
+        const exerciseDate = new Date(firstMethod.exercises[0].exercise_date)
+        return exerciseDate.toLocaleDateString('sl-SI', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }
+      
+      return 'No Date'
     }
   },
   methods: {
@@ -242,7 +269,10 @@ export default {
     },
     
     async fetchMicrocycleInfo() {
-      this.loading = true
+      // Don't show full loading screen if header is already mounted
+      if (!this.headerMounted) {
+        this.loading = true
+      }
       this.error = null
       
       try {
@@ -264,15 +294,20 @@ export default {
 
         this.microcycleInfo = response.data.microcycle_info
         
+        // Mark header as mounted after first successful fetch
+        if (!this.headerMounted) {
+          this.headerMounted = true
+        }
+        
       } catch (error) {
-        console.error('Error fetching microcycle info:', error)
+        console.error('Napaka pri pridobivanju mikrocikla:', error)
         
         if (error.response?.status === 401) {
           localStorage.removeItem('access_token')
           localStorage.removeItem('user')
           this.$router.push('/login')
         } else {
-          this.error = error.response?.data?.message || 'Failed to load microcycle information'
+          this.error = error.response?.data?.message || 'Napaka pri nalaganju informacij o mikrociklu.'
         }
       } finally {
         this.loading = false
@@ -280,17 +315,24 @@ export default {
     },
 
     onDayChange() {
+      this.loading = true
       this.fetchMicrocycleInfo()
     },
 
     previousDay() {
-      this.selectedDayOfWeek = this.selectedDayOfWeek === 1 ? 7 : this.selectedDayOfWeek - 1
-      this.fetchMicrocycleInfo()
+      if (this.selectedDayOfWeek > 1) {
+        this.selectedDayOfWeek = this.selectedDayOfWeek - 1
+        this.loading = true
+        this.fetchMicrocycleInfo()
+      }
     },
 
     nextDay() {
-      this.selectedDayOfWeek = this.selectedDayOfWeek === 7 ? 1 : this.selectedDayOfWeek + 1
-      this.fetchMicrocycleInfo()
+      if (this.selectedDayOfWeek < 7) {
+        this.selectedDayOfWeek = this.selectedDayOfWeek + 1
+        this.loading = true
+        this.fetchMicrocycleInfo()
+      }
     },
 
     showExerciseInfo(exercise) {
@@ -303,19 +345,9 @@ export default {
       this.selectedExercise = {}
     },
 
-    async toggleExerciseFinished(exercise) {
-      try {
-        // Here you would typically make an API call to update the exercise status
-        exercise.exercise_finished = !exercise.exercise_finished
-        this.showAlert('success', `Exercise ${exercise.exercise_finished ? 'completed' : 'marked as incomplete'}`)
-      } catch (error) {
-        this.showAlert('error', 'Failed to update exercise status')
-      }
-    },
-
     editExercise(exercise) {
       // Navigate to edit exercise page or open edit modal
-      this.showAlert('info', 'Edit functionality coming soon')
+      this.showAlert('Info', 'Funkcionalnost za urejanje bo narejena v kratkem.')
     },
 
     logout() {
@@ -343,18 +375,19 @@ export default {
 </script>
 
 <style scoped>
-/* Main Background - Matching the gradient from image */
+/* Main Background */
 .microcycle-bg {
   background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
   min-height: 100vh;
 }
 
-/* Today Header */
-.today-header {
+/* Exercise Date Header */
+.exercise-date-header {
   background: #10b981;
   backdrop-filter: blur(10px);
 }
 
+/* Navigation Buttons */
 .nav-button {
   width: 40px;
   height: 40px;
@@ -366,31 +399,33 @@ export default {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
 }
 
-.nav-button:hover {
+.nav-button:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
 
-/* Day Selector */
-.day-selector {
-  background: #10b981;
-  backdrop-filter: blur(10px);
+.nav-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
-.day-select {
+/* Inline Day Selector */
+.day-select-inline {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 8px 12px;
   color: #1f2937;
   font-weight: 500;
-  width: 200px;
+  min-width: 120px;
   transition: all 0.2s ease;
 }
 
-.day-select:focus {
+.day-select-inline:focus {
   outline: none;
   background: white;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
@@ -427,6 +462,8 @@ export default {
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
+
 
 .exercise-checkbox:checked {
   background: #10b981;
@@ -574,6 +611,12 @@ export default {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  .exercise-date-header .flex {
+    flex-direction: column;
+    align-items: flex-start;
+    space-y: 4;
+  }
+  
   .exercises-table {
     overflow-x: auto;
   }
@@ -583,7 +626,7 @@ export default {
     min-width: 800px;
   }
   
-  .day-select {
+  .day-select-inline {
     width: 100%;
   }
 }

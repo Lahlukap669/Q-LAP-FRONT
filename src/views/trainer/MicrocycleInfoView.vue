@@ -40,7 +40,7 @@
             
             <!-- Day Selector -->
             <div class="flex items-center space-x-3">
-              <button @click="previousDay" :disabled="selectedDayOfWeek <= 1" class="nav-button" :class="{ 'opacity-50 cursor-not-allowed': selectedDayOfWeek <= 1 }">
+              <button @click="previousDay()" :disabled="selectedDayOfWeek <= 1" class="nav-button" :class="{ 'opacity-50 cursor-not-allowed': selectedDayOfWeek <= 1 }">
                 <i class="fas fa-chevron-left"></i>
               </button>
               
@@ -58,7 +58,7 @@
                 <option value="7">Nedelja</option>
               </select>
               
-              <button @click="nextDay" :disabled="selectedDayOfWeek >= 7" class="nav-button" :class="{ 'opacity-50 cursor-not-allowed': selectedDayOfWeek >= 7 }">
+              <button @click="nextDay()" :disabled="selectedDayOfWeek >= 7" class="nav-button" :class="{ 'opacity-50 cursor-not-allowed': selectedDayOfWeek >= 7 }">
                 <i class="fas fa-chevron-right"></i>
               </button>
             </div>

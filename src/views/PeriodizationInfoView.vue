@@ -330,27 +330,37 @@ export default {
       }
     },
 
-    // NEW METHOD: Navigate to microcycle
     navigateToMicrocycle(week, weekNumber) {
-      // Check if it's the competition week
-      if (weekNumber === this.totalWeeks) {
-        this.showAlert('info', 'To je teden tekmovanja - ni povezan z mikrociklom.')
-        return
-      }
-
-      // Check if microcycle exists and has an ID
+    // Check if microcycle exists and has an ID
       if (!week.microcycle || !week.microcycle.id) {
-        this.showAlert('error', 'Mikrocikel ID ni na voljo.')
+        this.showAlert('error', 'Mikrocikel ID ni na voljo za ta teden.')
         return
       }
 
-      // Navigate to microcycle route
+      // Navigate to microcycle route with dayOfWeek = 1
       const microcycleId = week.microcycle.id
-      this.$router.push(`/trainer/microcycle/${microcycleId}/1`)
+      const dayOfWeek = 1 // Hardcoded to 1 as requested
+      
+      this.$router.push(`/trainer/microcycle/${microcycleId}/${dayOfWeek}`)
         .catch(err => {
           console.error('Navigation error:', err)
           this.showAlert('error', 'Napaka pri navigaciji na mikrocikel.')
         })
+    },
+    getWeekTooltip(week, weekNumber) {
+      if (!week.microcycle || !week.microcycle.id) {
+        return 'Mikrocikel ni na voljo'
+      }
+      
+      if (weekNumber === this.totalWeeks) {
+        return `Klikni za ogled mikrocikel ${week.microcycle.id} (Teden tekmovanja)`
+      }
+      
+      if (week.isActiveRest) {
+        return `Klikni za ogled mikrocikel ${week.microcycle.id} (Aktivni počitek)`
+      }
+      
+      return `Klikni za ogled mikrocikel ${week.microcycle.id}`
     },
     
     async fetchPeriodizationInfo() {

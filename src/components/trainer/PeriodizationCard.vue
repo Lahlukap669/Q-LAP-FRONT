@@ -11,7 +11,7 @@
       <div class="flex space-x-2">
         <button 
           @click.stop="$emit('delete', periodization.PERIODIZATION_ID)"
-          class="text-red-500 hover:text-red-700 transition duration-200"
+          class="delete-button"
         >
           <i class="fas fa-trash"></i>
         </button>
@@ -92,5 +92,15 @@ export default {
 
 .progress-fill {
   background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+}
+.delete-button {
+  color: #ef4444;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  color: #b91c1c !important;
+  transform: scale(1.1);
 }
 </style>

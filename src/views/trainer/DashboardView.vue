@@ -28,7 +28,7 @@
           :key="periodization.PERIODIZATION_ID"
           :periodization="periodization"
           @view="viewPeriodization"
-          @delete="deletePeriodization"
+          @delete="deletePeriodization(periodization.PERIODIZATION_ID)"
         />
 
         <!-- Empty State -->
@@ -54,6 +54,7 @@ import ErrorMessage from '@/components/ui/ErrorMessage.vue'
 import PeriodizationCard from '@/components/trainer/PeriodizationCard.vue'
 import EmptyState from '@/components/trainer/EmptyState.vue'
 import FloatingActionButton from '@/components/ui/FloatingActionButton.vue'
+import AppAlert from '@/components/ui/AppAlert.vue'
 
 export default {
   name: 'TrainerDashboardView',
@@ -64,7 +65,8 @@ export default {
     ErrorMessage,
     PeriodizationCard,
     EmptyState,
-    FloatingActionButton
+    FloatingActionButton,
+    AppAlert
   },
   data() {
     return {
@@ -140,9 +142,50 @@ export default {
       this.$router.push('/trainer/create-periodization')
     },
     
-    deletePeriodization(id) {
-      // Add delete functionality
-      console.log('Delete periodization:', id)
+    async deletePeriodization(id) {
+      if (!confirm('Are you sure you want to delete this periodization?')) {
+        return
+      }
+
+      try {
+        const token = localStorage.getItem('access_token')
+        if (!token) {
+          this.$router.push('/login')
+          return
+        }
+
+        // Use DELETE method instead of POST
+        const response = await axios.delete(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/delete-periodization`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          // For DELETE with body, use data property
+          data: {
+            periodization_id: id
+          }
+        })
+
+        // Show success message
+        if (this.showAlert) {
+          this.showAlert('success', response.data.message || 'Periodization deleted successfully')
+        } else {
+          alert(response.data.message || 'Periodization deleted successfully')
+        }
+        
+        // Refresh the periodizations list
+        await this.fetchPeriodizations()
+        
+      } catch (error) {
+        console.error('Error deleting periodization:', error)
+        
+        // Show error message
+        if (this.showAlert) {
+          this.showAlert('error', error.response?.data?.message || 'Failed to delete periodization')
+        } else {
+          alert(error.response?.data?.message || 'Failed to delete periodization')
+        }
+      }
     },
     
     logout() {

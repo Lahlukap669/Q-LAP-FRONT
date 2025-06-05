@@ -35,11 +35,6 @@ const router = createRouter({
       component: () => import('../views/trainer/TestsView.vue')
     },
     {
-      path: '/trainer/test-input',
-      name: 'test-input',
-      component: () => import('../views/trainer/TestInputView.vue')
-    },
-    {
       path: '/trainer/visualizations',
       name: 'visualizations',
       component: () => import('../views/trainer/VisualizationsView.vue')
@@ -58,6 +53,11 @@ const router = createRouter({
       path: '/trainer/microcycle/:microcycleId/:dayOfWeek?',
       name: 'microcycle-info',
       component: () => import('../views/trainer/MicrocycleInfoView.vue')
+    },
+    {
+      path: '/trainer/create-test',
+      name: 'create-test',
+      component: () => import('../views/trainer/CreateTestView.vue')
     },
     
     // Athlete routes

@@ -47,6 +47,7 @@
               <input 
                 type="date" 
                 v-model="testForm.test_date"
+                @change="onFormChange"
                 class="header-input date-input"
               >
             </div>
@@ -56,6 +57,7 @@
               <label class="dropdown-label">Select Athlete:</label>
               <select 
                 v-model="testForm.athlete_id"
+                @change="onFormChange"
                 class="header-input athlete-select"
               >
                 <option value="">Choose athlete...</option>
@@ -68,6 +70,21 @@
                 </option>
               </select>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past Test Info Banner -->
+      <div v-if="pastTestInfo.found_past_test" class="past-test-banner rounded-xl p-4 mb-6">
+        <div class="flex items-center">
+          <i class="fas fa-history text-orange-600 text-xl mr-3"></i>
+          <div>
+            <h4 class="font-bold text-orange-800">Past Test Found</h4>
+            <p class="text-orange-700 text-sm">
+              Found previous test from {{ formatDate(pastTestInfo.most_recent_test_date) }} 
+              with {{ pastTestInfo.exercises.length }} exercises. 
+              <span class="font-medium">Highlighted exercises</span> were used in that test with their units pre-filled.
+            </p>
           </div>
         </div>
       </div>
@@ -105,10 +122,17 @@
                 v-for="exercise in group.exercises" 
                 :key="exercise.id"
                 class="exercise-row grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/10 transition duration-200"
+                :class="{ 'past-test-exercise': isPastTestExercise(exercise.id) }"
               >
                 <!-- Exercise Name -->
                 <div class="col-span-6 flex items-center">
-                  <span class="exercise-name">{{ exercise.exercise }}</span>
+                  <div class="flex items-center space-x-2">
+                    <!-- Past Test Indicator -->
+                    <i v-if="isPastTestExercise(exercise.id)" 
+                       class="fas fa-history text-orange-500 text-sm" 
+                       title="Used in past test"></i>
+                    <span class="exercise-name">{{ exercise.exercise }}</span>
+                  </div>
                 </div>
 
                 <!-- Value Input -->
@@ -119,6 +143,7 @@
                     v-model="exerciseValues[exercise.id].value"
                     placeholder="Enter value"
                     class="value-input"
+                    :class="{ 'past-test-input': isPastTestExercise(exercise.id) }"
                   >
                 </div>
 
@@ -127,6 +152,7 @@
                   <select 
                     v-model="exerciseValues[exercise.id].unit"
                     class="unit-select"
+                    :class="{ 'past-test-input': isPastTestExercise(exercise.id) }"
                   >
                     <option value="">Unit</option>
                     <option value="m">m</option>
@@ -205,8 +231,14 @@ export default {
       showModal: false,
       selectedExercise: {},
       testForm: {
-        test_date: new Date().toISOString().split('T')[0], // Today's date
+        test_date: new Date().toISOString().split('T')[0],
         athlete_id: ''
+      },
+      pastTestInfo: {
+        found_past_test: false,
+        most_recent_test_id: null,
+        most_recent_test_date: null,
+        exercises: []
       }
     }
   },
@@ -269,6 +301,73 @@ export default {
       }
     },
 
+    async fetchPastTestExercises() {
+      if (!this.testForm.test_date || !this.testForm.athlete_id) {
+        this.pastTestInfo = {
+          found_past_test: false,
+          most_recent_test_id: null,
+          most_recent_test_date: null,
+          exercises: []
+        }
+        return
+      }
+
+      try {
+        const token = localStorage.getItem('access_token')
+        const response = await axios.post(
+          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/get-past-test-exercises`,
+          {
+            test_date: this.testForm.test_date,
+            athlete_id: parseInt(this.testForm.athlete_id)
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+
+        this.pastTestInfo = response.data
+        
+        // Pre-fill units for past test exercises
+        if (this.pastTestInfo.found_past_test && this.pastTestInfo.exercises) {
+          this.pastTestInfo.exercises.forEach(pastExercise => {
+            if (this.exerciseValues[pastExercise.exercise_id]) {
+              this.exerciseValues[pastExercise.exercise_id].unit = pastExercise.unit
+            }
+          })
+        }
+        
+      } catch (error) {
+        console.error('Error fetching past test exercises:', error)
+        this.pastTestInfo = {
+          found_past_test: false,
+          most_recent_test_id: null,
+          most_recent_test_date: null,
+          exercises: []
+        }
+      }
+    },
+
+    onFormChange() {
+      this.fetchPastTestExercises()
+    },
+
+    isPastTestExercise(exerciseId) {
+      return this.pastTestInfo.exercises.some(exercise => exercise.exercise_id === exerciseId)
+    },
+
+    formatDate(dateString) {
+      if (!dateString) return ''
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    },
+
     initializeExerciseValues() {
       const values = {}
       this.testExercises.forEach(ability => {
@@ -295,86 +394,85 @@ export default {
     },
 
     async saveTestResults() {
-        // Validate form
-        if (!this.testForm.athlete_id || !this.testForm.test_date) {
-            alert('Please select an athlete and test date')
-            return
+      // Validate form
+      if (!this.testForm.athlete_id || !this.testForm.test_date) {
+        alert('Please select an athlete and test date')
+        return
+      }
+
+      // Filter and format exercises - only include exercises with both measure and unit
+      const validExercises = Object.entries(this.exerciseValues)
+        .filter(([_, data]) => data.value && data.unit) // Only exercises with both value and unit
+        .map(([exerciseId, data]) => ({
+          exercise_id: parseInt(exerciseId),
+          measure: parseFloat(data.value),
+          unit: data.unit
+        }))
+
+      if (validExercises.length === 0) {
+        alert('Please enter at least one exercise with both value and unit')
+        return
+      }
+
+      // Prepare payload according to API specification
+      const payload = {
+        athlete_id: parseInt(this.testForm.athlete_id),
+        date: this.testForm.test_date,
+        exercises: validExercises
+      }
+
+      this.loading = true
+
+      try {
+        const token = localStorage.getItem('access_token')
+        if (!token) {
+          this.$router.push('/login')
+          return
         }
 
-        // Filter and format exercises - only include exercises with both measure and unit
-        const validExercises = Object.entries(this.exerciseValues)
-            .filter(([_, data]) => data.value && data.unit) // Only exercises with both value and unit
-            .map(([exerciseId, data]) => ({
-            exercise_id: parseInt(exerciseId),
-            measure: parseFloat(data.value),
-            unit: data.unit
-            }))
+        console.log('Creating test with payload:', payload)
 
-        if (validExercises.length === 0) {
-            alert('Please enter at least one exercise with both value and unit')
-            return
+        const response = await axios.post(
+          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/create-test`,
+          payload,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+
+        // Show success message from response
+        alert(response.data.message || 'Test created successfully')
+        
+        // Clear form and redirect
+        this.clearAllValues()
+        this.testForm = {
+          test_date: new Date().toISOString().split('T')[0],
+          athlete_id: ''
         }
+        
+        // Optionally redirect to dashboard
+        setTimeout(() => {
+          this.$router.push('/trainer/tests')
+        }, 1500)
 
-        // Prepare payload according to API specification
-        const payload = {
-            athlete_id: parseInt(this.testForm.athlete_id),
-            date: this.testForm.test_date,
-            exercises: validExercises
+      } catch (error) {
+        console.error('Error creating test:', error)
+        
+        if (error.response?.status === 401) {
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('user')
+          this.$router.push('/login')
+        } else {
+          const errorMessage = error.response?.data?.message || 'Failed to create test'
+          alert(errorMessage)
         }
-
-        this.loading = true
-
-        try {
-            const token = localStorage.getItem('access_token')
-            if (!token) {
-            this.$router.push('/login')
-            return
-            }
-
-            console.log('Creating test with payload:', payload)
-
-            const response = await axios.post(
-            `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/create-test`,
-            payload,
-            {
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-                }
-            }
-            )
-
-            // Show success message from response
-            alert(response.data.message || 'Test created successfully')
-            
-            // Clear form and redirect
-            this.clearAllValues()
-            this.testForm = {
-            test_date: new Date().toISOString().split('T')[0],
-            athlete_id: ''
-            }
-            
-            // Optionally redirect to dashboard
-            setTimeout(() => {
-            this.$router.push('/trainer/tests')
-            }, 1500)
-
-        } catch (error) {
-            console.error('Error creating test:', error)
-            
-            if (error.response?.status === 401) {
-            localStorage.removeItem('access_token')
-            localStorage.removeItem('user')
-            this.$router.push('/login')
-            } else {
-            const errorMessage = error.response?.data?.message || 'Failed to create test'
-            alert(errorMessage)
-            }
-        } finally {
-            this.loading = false
-        }
-        },
-
+      } finally {
+        this.loading = false
+      }
+    },
 
     logout() {
       localStorage.removeItem('access_token')
@@ -398,6 +496,32 @@ export default {
 
 .test-header {
   background: #10b981;
+}
+
+/* Past Test Banner */
+.past-test-banner {
+  background: rgba(251, 191, 36, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Past Test Exercise Highlighting */
+.past-test-exercise {
+  background: rgba(251, 191, 36, 0.1) !important;
+  border-left: 4px solid #f59e0b;
+}
+
+.past-test-exercise:hover {
+  background: rgba(251, 191, 36, 0.15) !important;
+}
+
+.past-test-input {
+  border: 2px solid #f59e0b !important;
+  background: rgba(251, 191, 36, 0.1) !important;
+}
+
+.past-test-input:focus {
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3) !important;
 }
 
 /* Header Dropdowns */

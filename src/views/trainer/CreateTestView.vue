@@ -10,7 +10,7 @@
     <div v-if="loading" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
         <i class="fas fa-spinner fa-spin text-4xl text-white mb-4"></i>
-        <p class="text-white text-lg">Loading test exercises...</p>
+        <p class="text-white text-lg">Nalaganje vaj testov...</p>
       </div>
     </div>
 
@@ -18,10 +18,10 @@
     <div v-else-if="error" class="flex items-center justify-center min-h-screen">
       <div class="text-center bg-white rounded-xl p-8 mx-4">
         <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Error Loading Test Exercises</h3>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Napaka pri nalaganju vaj testov</h3>
         <p class="text-gray-600 mb-4">{{ error }}</p>
         <button @click="fetchTestExercises" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-200">
-          <i class="fas fa-redo mr-2"></i>Try Again
+          <i class="fas fa-redo mr-2"></i>poskusi ponovno
         </button>
       </div>
     </div>
@@ -34,16 +34,16 @@
           <!-- Left: Title -->
           <div>
             <h1 class="text-3xl font-bold text-white mb-2">
-              <i class="fas fa-clipboard-list mr-3"></i>CREATE TEST
+              <i class="fas fa-clipboard-list mr-3"></i>USTVARI TEST
             </h1>
-            <p class="text-white/90">Enter test results for each exercise</p>
+            <p class="text-white/90">Vnesi meritve za izbrane teste. Izbrane vaje bodo zahtevane na naslednjem testu. Vnašamo Maksimalne meritve 1 ponovitve (MVC).</p>
           </div>
           
           <!-- Right: Date and Athlete Dropdowns -->
           <div class="flex items-center space-x-4">
             <!-- Date Picker -->
             <div class="dropdown-container">
-              <label class="dropdown-label">Test Date:</label>
+              <label class="dropdown-label">Datum testa:</label>
               <input 
                 type="date" 
                 v-model="testForm.test_date"
@@ -54,13 +54,13 @@
             
             <!-- Athlete Selector -->
             <div class="dropdown-container">
-              <label class="dropdown-label">Select Athlete:</label>
+              <label class="dropdown-label">Izberi športnika:</label>
               <select 
                 v-model="testForm.athlete_id"
                 @change="onFormChange"
                 class="header-input athlete-select"
               >
-                <option value="">Choose athlete...</option>
+                <option value="">Izberi športnika...</option>
                 <option 
                   v-for="athlete in athletes" 
                   :key="athlete.id" 
@@ -74,29 +74,29 @@
         </div>
       </div>
 
-      <!-- Past Test Info Banner -->
+      <!--Past test info banner-->
       <div v-if="pastTestInfo.found_past_test" class="past-test-banner rounded-xl p-4 mb-6">
-        <div class="flex items-center">
-          <i class="fas fa-history text-orange-600 text-xl mr-3"></i>
-          <div>
-            <h4 class="font-bold text-orange-800">Past Test Found</h4>
-            <p class="text-orange-700 text-sm">
-              Found previous test from {{ formatDate(pastTestInfo.most_recent_test_date) }} 
-              with {{ pastTestInfo.exercises.length }} exercises. 
-              <span class="font-medium">Highlighted exercises</span> were used in that test with their units pre-filled.
-            </p>
-          </div>
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-circle text-orange-600 text-xl mr-3"></i>
+        <div>
+          <h4 class="font-bold text-orange-800">Prejšnji test je bil odkrit</h4>
+          <p class="text-orange-700 text-sm">
+            Odkrit prejšnji test {{ formatDate(pastTestInfo.most_recent_test_date) }} 
+            z {{ pastTestInfo.exercises.length }} vajami. 
+            <span class="font-bold">Izpolnjene morajo biti vse vaje</span> iz preteklega testa.
+          </p>
         </div>
       </div>
+    </div>
 
       <!-- Test Exercises Table -->
       <div class="exercises-table rounded-xl overflow-hidden">
         <!-- Table Header -->
         <div class="table-header grid grid-cols-12 gap-4 p-4">
-          <div class="col-span-6 text-left font-semibold text-white">EXERCISE</div>
-          <div class="col-span-3 text-center font-semibold text-white">VALUE</div>
-          <div class="col-span-2 text-center font-semibold text-white">UNIT</div>
-          <div class="col-span-1 text-center font-semibold text-white">INFO</div>
+          <div class="col-span-6 text-left font-semibold text-white">VAJA</div>
+          <div class="col-span-3 text-center font-semibold text-white">MERITEV</div>
+          <div class="col-span-2 text-center font-semibold text-white">ENOTA</div>
+          <div class="col-span-1 text-center font-semibold text-white">PODROBNOSTI</div>
         </div>
 
         <!-- Exercise Rows -->
@@ -127,10 +127,11 @@
                 <!-- Exercise Name -->
                 <div class="col-span-6 flex items-center">
                   <div class="flex items-center space-x-2">
-                    <!-- Past Test Indicator -->
-                    <i v-if="isPastTestExercise(exercise.id)" 
-                       class="fas fa-history text-orange-500 text-sm" 
-                       title="Used in past test"></i>
+                    <!-- Past Test Indicator with Required -->
+                    <div v-if="isPastTestExercise(exercise.id)" class="flex items-center space-x-1">
+                      <i class="fas fa-history text-orange-500 text-sm" title="Used in past test"></i>
+                      <span class="required-indicator">*</span>
+                    </div>
                     <span class="exercise-name">{{ exercise.exercise }}</span>
                   </div>
                 </div>
@@ -141,7 +142,7 @@
                     type="number" 
                     step="0.01"
                     v-model="exerciseValues[exercise.id].value"
-                    placeholder="Enter value"
+                    placeholder="Vnesi meritev"
                     class="value-input"
                     :class="{ 'past-test-input': isPastTestExercise(exercise.id) }"
                   >
@@ -154,7 +155,7 @@
                     class="unit-select"
                     :class="{ 'past-test-input': isPastTestExercise(exercise.id) }"
                   >
-                    <option value="">Unit</option>
+                    <option value="">Enota</option>
                     <option value="m">m</option>
                     <option value="cm">cm</option>
                     <option value="s">s</option>
@@ -184,14 +185,14 @@
           :disabled="!isFormValid"
           class="save-btn px-8 py-4 rounded-xl font-bold text-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <i class="fas fa-save mr-2"></i>SAVE TEST RESULTS
+          <i class="fas fa-save mr-2"></i>SHRANI MERITVE TESTA
         </button>
         
         <button 
           @click="clearAllValues"
           class="clear-btn px-8 py-4 rounded-xl font-bold text-lg transition duration-300"
         >
-          <i class="fas fa-eraser mr-2"></i>CLEAR ALL
+          <i class="fas fa-eraser mr-2"></i>POČISTI VSE
         </button>
       </div>
     </div>
@@ -248,11 +249,24 @@ export default {
       return `${user.first_name} ${user.last_name}` || 'Trainer'
     },
     isFormValid() {
-      return this.testForm.test_date && 
-             this.testForm.athlete_id && 
-             Object.values(this.exerciseValues).some(exercise => 
-               exercise.value && exercise.unit
-             )
+      if (!this.testForm.test_date || !this.testForm.athlete_id) {
+        return false
+      }
+      
+      // If past test found, ALL past exercises must be filled
+      if (this.pastTestInfo.found_past_test) {
+        const pastExerciseIds = this.pastTestInfo.exercises.map(ex => ex.exercise_id)
+        const allPastExercisesFilled = pastExerciseIds.every(exerciseId => {
+          const exercise = this.exerciseValues[exerciseId]
+          return exercise && exercise.value && exercise.unit
+        })
+        return allPastExercisesFilled
+      }
+      
+      // If no past test, at least one exercise must be filled
+      return Object.values(this.exerciseValues).some(exercise => 
+        exercise.value && exercise.unit
+      )
     }
   },
   methods: {
@@ -270,7 +284,7 @@ export default {
         )
         this.athletes = response.data.athletes || []
       } catch (error) {
-        console.error('Error fetching athletes:', error)
+        console.error('Napaka pri nalaganju športnikov:', error)
       }
     },
 
@@ -295,7 +309,7 @@ export default {
         
       } catch (error) {
         console.error('Error:', error)
-        this.error = 'Failed to load test exercises'
+        this.error = 'Napaka pri nalaganju vaj.'
       } finally {
         this.loading = false
       }
@@ -340,7 +354,7 @@ export default {
         }
         
       } catch (error) {
-        console.error('Error fetching past test exercises:', error)
+        console.error('Napaka pri pridobivanju preteklih vaj:', error)
         this.pastTestInfo = {
           found_past_test: false,
           most_recent_test_id: null,
@@ -361,7 +375,7 @@ export default {
     formatDate(dateString) {
       if (!dateString) return ''
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString('sl-SI', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -396,7 +410,7 @@ export default {
     async saveTestResults() {
       // Validate form
       if (!this.testForm.athlete_id || !this.testForm.test_date) {
-        alert('Please select an athlete and test date')
+        alert('Športnik in datum sta obvezna')
         return
       }
 
@@ -410,8 +424,22 @@ export default {
         }))
 
       if (validExercises.length === 0) {
-        alert('Please enter at least one exercise with both value and unit')
-        return
+          alert('Vsaj ena vaja skupaj z meritvijo in enoto je obvezna.')
+          return
+      }
+
+      // Add validation for past exercises
+      if (this.pastTestInfo.found_past_test) {
+          const pastExerciseIds = this.pastTestInfo.exercises.map(ex => ex.exercise_id)
+          const missingPastExercises = pastExerciseIds.filter(exerciseId => {
+              const exercise = this.exerciseValues[exerciseId]
+              return !exercise || !exercise.value || !exercise.unit
+          })
+          
+          if (missingPastExercises.length > 0) {
+              alert(`Vse vaje iz prejšnjega testa morajo biti izpolnjene. Manjkajo ${missingPastExercises.length} vaje/a.`)
+              return
+          }
       }
 
       // Prepare payload according to API specification
@@ -466,12 +494,31 @@ export default {
           localStorage.removeItem('user')
           this.$router.push('/login')
         } else {
-          const errorMessage = error.response?.data?.message || 'Failed to create test'
+          const errorMessage = error.response?.data?.message || 'Napaka pri ustvarjanju testa'
           alert(errorMessage)
         }
       } finally {
         this.loading = false
       }
+    },
+    getMissingPastExercisesCount() {
+      if (!this.pastTestInfo.found_past_test) return 0
+      
+      const pastExerciseIds = this.pastTestInfo.exercises.map(ex => ex.exercise_id)
+      return pastExerciseIds.filter(exerciseId => {
+        const exercise = this.exerciseValues[exerciseId]
+        return !exercise || !exercise.value || !exercise.unit
+      }).length
+    },
+    
+    getCompletedPastExercisesCount() {
+      if (!this.pastTestInfo.found_past_test) return 0
+      
+      const pastExerciseIds = this.pastTestInfo.exercises.map(ex => ex.exercise_id)
+      return pastExerciseIds.filter(exerciseId => {
+        const exercise = this.exerciseValues[exerciseId]
+        return exercise && exercise.value && exercise.unit
+      }).length
     },
 
     logout() {
@@ -490,8 +537,20 @@ export default {
 
 <style scoped>
 .test-bg {
-  background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
   min-height: 100vh;
+}
+.required-indicator {
+  color: #dc2626;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+/* Enhanced styling for past test inputs when empty */
+.past-test-input:invalid,
+.past-test-input:placeholder-shown {
+  border-color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.1) !important;
 }
 
 .test-header {

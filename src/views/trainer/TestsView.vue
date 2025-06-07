@@ -11,9 +11,9 @@
       <!-- Welcome Section -->
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-white mb-2">
-          <i class="fas fa-clipboard-list mr-3"></i>TESTS OVERVIEW
+          <i class="fas fa-clipboard-list mr-3"></i>POGLED NAD TESTI
         </h1>
-        <p class="text-white/90">View all conducted tests</p>
+        <p class="text-white/90">Pogled nad vsemi izvedenimi testi.</p>
       </div>
 
       <!-- Search Bar -->
@@ -24,7 +24,7 @@
             <input 
               type="text" 
               v-model="searchTerm"
-              placeholder="Search by athlete name or date..."
+              placeholder="Išči po športniku ali datumu (glej zapis datuma)..."
               class="search-input"
             >
             <button 
@@ -42,7 +42,7 @@
       <div v-if="loading" class="flex items-center justify-center min-h-[400px]">
         <div class="text-center">
           <i class="fas fa-spinner fa-spin text-4xl text-white mb-4"></i>
-          <p class="text-white text-lg">Loading tests...</p>
+          <p class="text-white text-lg">Nalaganje testov...</p>
         </div>
       </div>
 
@@ -50,13 +50,13 @@
       <div v-else-if="error" class="flex items-center justify-center min-h-[400px]">
         <div class="text-center bg-white rounded-xl p-8">
           <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-          <h3 class="text-xl font-bold text-gray-800 mb-2">Error Loading Tests</h3>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Napaka pri nalaganju testov</h3>
           <p class="text-gray-600 mb-4">{{ error }}</p>
           <button 
             @click="fetchTests" 
             class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-200"
           >
-            <i class="fas fa-redo mr-2"></i>Try Again
+            <i class="fas fa-redo mr-2"></i>Poskusi ponovno
           </button>
         </div>
       </div>
@@ -79,14 +79,14 @@
           <!-- Test Header -->
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-2xl font-bold text-gray-800 mb-1">Test #{{ test.id }}</h2>
+              <h2 class="text-2xl font-bold text-gray-800 mb-1">Test {{ test.id }}</h2>
               <p class="text-gray-600">{{ formatDate(test.test_date) }}</p>
             </div>
             
             <!-- Status Badge -->
             <div class="status-badge">
               <i class="fas fa-check-circle text-green-500 mr-2"></i>
-              <span class="text-green-600 font-medium">Completed</span>
+              <span class="text-green-600 font-medium">Končano</span>
             </div>
           </div>
 
@@ -97,7 +97,7 @@
                 <i class="fas fa-user text-white"></i>
               </div>
               <div class="ml-3">
-                <p class="text-sm text-gray-600">Athlete</p>
+                <p class="text-sm text-gray-600">Športnik</p>
                 <p class="font-semibold text-gray-800">{{ test.athlete_full_name }}</p>
               </div>
             </div>
@@ -109,7 +109,7 @@
               @click="viewTest(test.id)"
               class="view-btn flex-1 py-3 px-6 rounded-lg font-bold transition duration-300"
             >
-              <i class="fas fa-eye mr-2"></i>VIEW DETAILS
+              <i class="fas fa-eye mr-2"></i>PODROBNOSTI
             </button>
             <button 
               @click="deleteTest(test.id)"
@@ -125,13 +125,13 @@
           <div class="empty-icon mb-6">
             <i class="fas fa-clipboard-list text-6xl text-white/30"></i>
           </div>
-          <h3 class="text-2xl font-bold text-white mb-4">No Tests Found</h3>
-          <p class="text-white/80 mb-8">You haven't created any tests yet.</p>
+          <h3 class="text-2xl font-bold text-white mb-4">Ni najdenih testov.</h3>
+          <p class="text-white/80 mb-8">Nisi ustvaril še nobenega testa.</p>
           <button 
             @click="createTest"
             class="create-btn px-8 py-3 rounded-xl font-bold transition duration-300"
           >
-            <i class="fas fa-plus mr-2"></i>Create First Test
+            <i class="fas fa-plus mr-2"></i>Ustvari prvi test
           </button>
         </div>
 
@@ -140,13 +140,13 @@
           <div class="empty-icon mb-6">
             <i class="fas fa-search text-6xl text-white/30"></i>
           </div>
-          <h3 class="text-2xl font-bold text-white mb-4">No Results Found</h3>
-          <p class="text-white/80 mb-8">No tests match your search criteria.</p>
+          <h3 class="text-2xl font-bold text-white mb-4">Ni najdenih rezultatov.</h3>
+          <p class="text-white/80 mb-8">Nobeden test ne ustreza iskalnim pogojem.</p>
           <button 
             @click="clearSearch"
             class="clear-btn px-8 py-3 rounded-xl font-bold transition duration-300"
           >
-            <i class="fas fa-times mr-2"></i>Clear Search
+            <i class="fas fa-times mr-2"></i>Počisti iskanje
           </button>
         </div>
       </div>
@@ -233,7 +233,7 @@ export default {
           localStorage.removeItem('user')
           this.$router.push('/login')
         } else {
-          this.error = error.response?.data?.message || 'Failed to load tests'
+          this.error = error.response?.data?.message || 'Napaka pri nalaganju testov'
         }
       } finally {
         this.loading = false
@@ -259,7 +259,7 @@ export default {
     },
 
     async deleteTest(id) {
-      if (!confirm('Are you sure you want to delete this test?')) {
+      if (!confirm('Želiš res izbrisati izbrani test?')) {
         return
       }
 
@@ -276,12 +276,12 @@ export default {
           }
         })
 
-        alert(response.data.message || 'Test deleted successfully')
+        alert(response.data.message || 'Test uspešno izbrisan')
         this.fetchTests() // Refresh the list
         
       } catch (error) {
-        console.error('Error deleting test:', error)
-        alert(error.response?.data?.message || 'Failed to delete test')
+        console.error('Napaka pri brisanju testa:', error)
+        alert(error.response?.data?.message || 'Napaka pri brisanju testa')
       }
     },
 

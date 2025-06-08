@@ -143,7 +143,7 @@ export default {
     },
     
     async deletePeriodization(id) {
-      if (!confirm('Are you sure you want to delete this periodization?')) {
+      if (!confirm('Želiš res izbrisati ciklizacijo?')) {
         return
       }
 
@@ -168,9 +168,9 @@ export default {
 
         // Show success message
         if (this.showAlert) {
-          this.showAlert('success', response.data.message || 'Periodization deleted successfully')
+          this.showAlert('success', response.data.message || 'Ciklizacija uspešno izbrisana')
         } else {
-          alert(response.data.message || 'Periodization deleted successfully')
+          alert(response.data.message || 'Ciklizacija uspešno izbrisana')
         }
         
         // Refresh the periodizations list
@@ -181,9 +181,9 @@ export default {
         
         // Show error message
         if (this.showAlert) {
-          this.showAlert('error', error.response?.data?.message || 'Failed to delete periodization')
+          this.showAlert('error', error.response?.data?.message || 'Napaka pri brisanju ciklizacije')
         } else {
-          alert(error.response?.data?.message || 'Failed to delete periodization')
+          alert(error.response?.data?.message || 'Napaka pri brisanju ciklizacije')
         }
       }
     },

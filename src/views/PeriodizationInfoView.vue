@@ -394,7 +394,7 @@ export default {
         this.periodizationInfo = response.data.periodization_info
         
       } catch (error) {
-        console.error('Error fetching periodization info:', error)
+        console.error('Napaka pri nalaganju vsebine ciklizacije:', error)
         
         if (error.response?.status === 401) {
           localStorage.removeItem('access_token')

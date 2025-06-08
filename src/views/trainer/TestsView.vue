@@ -293,6 +293,51 @@ export default {
       localStorage.removeItem('access_token')
       localStorage.removeItem('user')
       this.$router.push('/login')
+    },
+    async delete_test(id) {
+      if (!confirm('Želiš res izbrisati Test?')) {
+        return
+      }
+
+      try {
+        const token = localStorage.getItem('access_token')
+        if (!token) {
+          this.$router.push('/login')
+          return
+        }
+
+        // Use DELETE method instead of POST
+        const response = await axios.delete(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/delete-test`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          // For DELETE with body, use data property
+          data: {
+            test_id: id
+          }
+        })
+
+        // Show success message
+        if (this.showAlert) {
+          this.showAlert('success', response.data.message || 'test uspešno izbrisan')
+        } else {
+          alert(response.data.message || 'test uspešno izbrisan')
+        }
+        
+        // Refresh the periodizations list
+        await this.fetchTests()
+        
+      } catch (error) {
+        console.error('Error deleting periodization:', error)
+        
+        // Show error message
+        if (this.showAlert) {
+          this.showAlert('error', error.response?.data?.message || 'Napaka pri brisanju testa')
+        } else {
+          alert(error.response?.data?.message || 'Napaka pri brisanju testa')
+        }
+      }
     }
   },
 

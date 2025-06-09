@@ -66,21 +66,6 @@
         </div>
       </div>
 
-      <!-- Debug Info -->
-      <div v-if="selectedAthleteId && (testAnalytics || motorAbilityAnalytics)" class="debug-info bg-white rounded-xl p-4 mb-6">
-        <h4 class="font-bold mb-2">Debug informacije:</h4>
-        <div v-if="selectedVisualizationType === 'Testi' && testAnalytics">
-          <p>Tip: Testi</p>
-          <p>Število testov: {{ testAnalytics.tests ? testAnalytics.tests.length : 0 }}</p>
-          <p>Število grafov: {{ chartsData.length }}</p>
-        </div>
-        <div v-if="selectedVisualizationType === 'Gibalne sposobnosti' && motorAbilityAnalytics">
-          <p>Tip: Gibalne sposobnosti</p>
-          <p>Število testov: {{ motorAbilityAnalytics.tests ? motorAbilityAnalytics.tests.length : 0 }}</p>
-          <p>Število grafov: {{ motorAbilityChartsData.length }}</p>
-        </div>
-      </div>
-
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center min-h-[400px]">
         <div class="text-center">
@@ -878,7 +863,7 @@ export default {
 
 /* Selection Banner */
 .selection-banner {
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }

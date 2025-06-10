@@ -242,8 +242,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 import AppAlert from '@/components/ui/AppAlert.vue'
 
@@ -301,33 +300,31 @@ export default {
     
     async fetchAthletes() {
       try {
-        const token = localStorage.getItem('access_token')
-        const response = await axios.get(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/my-athletes`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        this.athletes = response.data.athletes || []
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/my-athletes');
+        this.athletes = response.data.athletes || [];
       } catch (error) {
-        console.error('Napaka pri nalaganju športnikov:', error)
-        this.showAlert('error', 'Napaka pri nalaganju športnikov.')
+        console.error('Napaka pri nalaganju športnikov:', error);
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+        } else {
+          this.showAlert('error', 'Napaka pri nalaganju športnikov.');
+        }
       }
     },
 
     async fetchTrainingMethods() {
       try {
-        const token = localStorage.getItem('access_token')
-        const response = await axios.get(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/methods`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        this.trainingMethods = response.data.data || []
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/methods');
+        this.trainingMethods = response.data.data || [];
       } catch (error) {
-        console.error('Napaka pri pridobivanju metod:', error)
-        this.showAlert('error', 'Napaka pri pridobivanju metod.')
+        console.error('Napaka pri pridobivanju metod:', error);
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+        } else {
+          this.showAlert('error', 'Napaka pri pridobivanju metod.');
+        }
       }
     },
 
@@ -440,12 +437,10 @@ export default {
     },
 
     async savePeriodization() {
-      this.loading = true
+      this.loading = true;
 
       try {
-        const token = localStorage.getItem('access_token')
-
-        // Format data for API
+        // Format data for API (same as before)
         const payload = {
           athlete_id: parseInt(this.form.athlete_id),
           difficulty: parseInt(this.form.difficulty),
@@ -453,31 +448,37 @@ export default {
           mesocycle_lengths: this.form.mesocycle_lengths.join(','),
           method_ids: this.form.selected_methods.map(methods => methods.join(',')).join('|'),
           periodization_name: this.form.periodization_name.trim()
-        }
+        };
 
-        console.log('Payload:', payload) // Debug
+        console.log('Payload:', payload);
 
-        const response = await axios.post(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/create-periodization`, payload, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
+        // No manual token handling needed!
+        const response = await apiClient.post('/users/trainer/create-periodization', payload);
 
-        this.showAlert('success', response.data.message)
+        this.showAlert('success', response.data.message);
 
         // Redirect to dashboard after 1.5 seconds
         setTimeout(() => {
-          this.$router.push('/trainer')
-        }, 1500)
+          this.$router.push('/trainer');
+        }, 1500);
 
       } catch (error) {
-        console.error('Napaka pri ustvarjanju ciklizacije:', error)
-        const errorMessage = error.response?.data?.message || 'Napaka pri ustvarjanju ciklizacije'
-        this.showAlert('error', errorMessage)
+        console.error('Napaka pri ustvarjanju ciklizacije:', error);
+        
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+        } else {
+          const errorMessage = error.response?.data?.message || 'Napaka pri ustvarjanju ciklizacije';
+          this.showAlert('error', errorMessage);
+        }
       } finally {
-        this.loading = false
+        this.loading = false;
       }
+    },
+
+    // ✅ Keep your other methods unchanged
+    showAlert(type, message) {
+      this.alert = { show: true, type: type, message: message };
     },
 
     cancelCreation() {

@@ -213,8 +213,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 
 export default {
@@ -272,46 +271,35 @@ export default {
   methods: {
     async fetchAthletes() {
       try {
-        const token = localStorage.getItem('access_token')
-        const response = await axios.get(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/my-athletes`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        this.athletes = response.data.athletes || []
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/my-athletes');
+        this.athletes = response.data.athletes || [];
       } catch (error) {
-        console.error('Napaka pri nalaganju športnikov:', error)
+        console.error('Napaka pri nalaganju športnikov:', error);
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+        }
       }
     },
 
     async fetchTestExercises() {
-      this.loading = true
-      this.error = null
+      this.loading = true;
+      this.error = null;
       
       try {
-        const token = localStorage.getItem('access_token')
-        const response = await axios.get(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/get-test-exercises`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-
-        this.testExercises = response.data.data || []
-        this.initializeExerciseValues()
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/get-test-exercises');
+        this.testExercises = response.data.data || [];
+        this.initializeExerciseValues();
         
       } catch (error) {
-        console.error('Error:', error)
-        this.error = 'Napaka pri nalaganju vaj.'
+        console.error('Error:', error);
+        this.error = 'Napaka pri nalaganju vaj.';
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+        }
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
@@ -322,45 +310,39 @@ export default {
           most_recent_test_id: null,
           most_recent_test_date: null,
           exercises: []
-        }
-        return
+        };
+        return;
       }
 
       try {
-        const token = localStorage.getItem('access_token')
-        const response = await axios.post(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/get-past-test-exercises`,
-          {
-            test_date: this.testForm.test_date,
-            athlete_id: parseInt(this.testForm.athlete_id)
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        // No manual token handling needed!
+        const response = await apiClient.post('/users/trainer/get-past-test-exercises', {
+          test_date: this.testForm.test_date,
+          athlete_id: parseInt(this.testForm.athlete_id)
+        });
 
-        this.pastTestInfo = response.data
+        this.pastTestInfo = response.data;
         
         // Pre-fill units for past test exercises
         if (this.pastTestInfo.found_past_test && this.pastTestInfo.exercises) {
           this.pastTestInfo.exercises.forEach(pastExercise => {
             if (this.exerciseValues[pastExercise.exercise_id]) {
-              this.exerciseValues[pastExercise.exercise_id].unit = pastExercise.unit
+              this.exerciseValues[pastExercise.exercise_id].unit = pastExercise.unit;
             }
-          })
+          });
         }
         
       } catch (error) {
-        console.error('Napaka pri pridobivanju preteklih vaj:', error)
+        console.error('Napaka pri pridobivanju preteklih vaj:', error);
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+        }
         this.pastTestInfo = {
           found_past_test: false,
           most_recent_test_id: null,
           most_recent_test_date: null,
           exercises: []
-        }
+        };
       }
     },
 
@@ -410,36 +392,36 @@ export default {
     async saveTestResults() {
       // Validate form
       if (!this.testForm.athlete_id || !this.testForm.test_date) {
-        alert('Športnik in datum sta obvezna')
-        return
+        alert('Športnik in datum sta obvezna');
+        return;
       }
 
       // Filter and format exercises - only include exercises with both measure and unit
       const validExercises = Object.entries(this.exerciseValues)
-        .filter(([_, data]) => data.value && data.unit) // Only exercises with both value and unit
+        .filter(([_, data]) => data.value && data.unit)
         .map(([exerciseId, data]) => ({
           exercise_id: parseInt(exerciseId),
           measure: parseFloat(data.value),
           unit: data.unit
-        }))
+        }));
 
       if (validExercises.length === 0) {
-          alert('Vsaj ena vaja skupaj z meritvijo in enoto je obvezna.')
-          return
+        alert('Vsaj ena vaja skupaj z meritvijo in enoto je obvezna.');
+        return;
       }
 
       // Add validation for past exercises
       if (this.pastTestInfo.found_past_test) {
-          const pastExerciseIds = this.pastTestInfo.exercises.map(ex => ex.exercise_id)
-          const missingPastExercises = pastExerciseIds.filter(exerciseId => {
-              const exercise = this.exerciseValues[exerciseId]
-              return !exercise || !exercise.value || !exercise.unit
-          })
-          
-          if (missingPastExercises.length > 0) {
-              alert(`Vse vaje iz prejšnjega testa morajo biti izpolnjene. Manjkajo ${missingPastExercises.length} vaje/a.`)
-              return
-          }
+        const pastExerciseIds = this.pastTestInfo.exercises.map(ex => ex.exercise_id);
+        const missingPastExercises = pastExerciseIds.filter(exerciseId => {
+          const exercise = this.exerciseValues[exerciseId];
+          return !exercise || !exercise.value || !exercise.unit;
+        });
+        
+        if (missingPastExercises.length > 0) {
+          alert(`Vse vaje iz prejšnjega testa morajo biti izpolnjene. Manjkajo ${missingPastExercises.length} vaje/a.`);
+          return;
+        }
       }
 
       // Prepare payload according to API specification
@@ -447,58 +429,42 @@ export default {
         athlete_id: parseInt(this.testForm.athlete_id),
         date: this.testForm.test_date,
         exercises: validExercises
-      }
+      };
 
-      this.loading = true
+      this.loading = true;
 
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
+        console.log('Creating test with payload:', payload);
 
-        console.log('Creating test with payload:', payload)
-
-        const response = await axios.post(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/create-test`,
-          payload,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        // No manual token handling needed!
+        const response = await apiClient.post('/users/trainer/create-test', payload);
 
         // Show success message from response
-        alert(response.data.message || 'Test created successfully')
+        alert(response.data.message || 'Test created successfully');
         
         // Clear form and redirect
-        this.clearAllValues()
+        this.clearAllValues();
         this.testForm = {
           test_date: new Date().toISOString().split('T')[0],
           athlete_id: ''
-        }
+        };
         
-        // Optionally redirect to dashboard
+        // Redirect to tests view
         setTimeout(() => {
-          this.$router.push('/trainer/tests')
-        }, 1500)
+          this.$router.push('/trainer/tests');
+        }, 1500);
 
       } catch (error) {
-        console.error('Error creating test:', error)
+        console.error('Error creating test:', error);
         
         if (error.response?.status === 401) {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('user')
-          this.$router.push('/login')
+          this.$router.push('/login');
         } else {
-          const errorMessage = error.response?.data?.message || 'Napaka pri ustvarjanju testa'
-          alert(errorMessage)
+          const errorMessage = error.response?.data?.message || 'Napaka pri ustvarjanju testa';
+          alert(errorMessage);
         }
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     getMissingPastExercisesCount() {

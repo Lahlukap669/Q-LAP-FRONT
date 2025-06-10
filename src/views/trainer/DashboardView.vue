@@ -45,8 +45,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 import WelcomeSection from '@/components/trainer/WelcomeSection.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
@@ -87,18 +86,8 @@ export default {
       this.error = null
       
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-
-        const response = await axios.get(`${API_ENDPOINTS.TRAINER_PERIODIZATIONS}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/periodizations')
 
         this.periodizations = response.data.periodizations.map(p => {
           const progress = this.calculateProgress(p.DATE_CREATED, p.END_DATE)

@@ -215,8 +215,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 import Chart from 'chart.js/auto'
 
@@ -248,20 +247,15 @@ export default {
   methods: {
     async fetchAthletes() {
       try {
-        const token = localStorage.getItem('access_token')
-        const response = await axios.get(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/my-athletes`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/my-athletes')
         this.athletes = response.data.athletes || []
         console.log('Atletje naloženi:', this.athletes)
       } catch (error) {
         console.error('Error fetching athletes:', error)
+        if (error.response?.status === 401) {
+          this.$router.push('/login')
+        }
       }
     },
 
@@ -272,26 +266,12 @@ export default {
       this.error = null
       
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-
         console.log('Kličem TEST API za atleta:', this.selectedAthleteId)
 
-        const response = await axios.post(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/get-test-analytics`,
-          {
-            athlete_id: parseInt(this.selectedAthleteId)
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        // No manual token handling needed!
+        const response = await apiClient.post('/users/trainer/get-test-analytics', {
+          athlete_id: parseInt(this.selectedAthleteId)
+        })
 
         console.log('Test API response:', response.data)
         this.testAnalytics = response.data
@@ -319,26 +299,12 @@ export default {
       this.error = null
       
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-
         console.log('Kličem MOTOR ABILITY API za atleta:', this.selectedAthleteId)
 
-        const response = await axios.post(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/get-motor-ability-analytics`,
-          {
-            athlete_id: parseInt(this.selectedAthleteId)
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        // No manual token handling needed!
+        const response = await apiClient.post('/users/trainer/get-motor-ability-analytics', {
+          athlete_id: parseInt(this.selectedAthleteId)
+        })
 
         console.log('Motor Ability API response:', response.data)
         this.motorAbilityAnalytics = response.data

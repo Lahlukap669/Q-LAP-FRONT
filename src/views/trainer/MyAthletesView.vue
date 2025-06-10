@@ -100,8 +100,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 import AppAlert from '@/components/ui/AppAlert.vue'
 
@@ -141,21 +140,15 @@ export default {
     async fetchAthletes() {
       this.loading = true
       this.error = null
+      
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-        const response = await axios.get(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/my-athletes`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/my-athletes')
         this.athletes = response.data.athletes || []
+        
       } catch (error) {
         console.error('Error fetching athletes:', error)
+        
         if (error.response?.status === 401) {
           localStorage.removeItem('access_token')
           localStorage.removeItem('user')
@@ -173,19 +166,22 @@ export default {
       }
       
       this.deletingAthletes.push(athlete.id)
+      
       try {
-        const token = localStorage.getItem('access_token')
-        await axios.delete(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/delete-athlete/${athlete.id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        this.showAlert('success', `${athlete.first_name} ${athlete.last_name} Je bil izbrisan.`)
+        // No manual token handling needed!
+        await apiClient.delete(`/users/trainer/delete-athlete/${athlete.id}`)
+        
+        this.showAlert('success', `${athlete.first_name} ${athlete.last_name} je bil izbrisan.`)
         this.athletes = this.athletes.filter(a => a.id !== athlete.id)
+        
       } catch (error) {
         console.error('Error deleting athlete:', error)
-        this.showAlert('error', error.response?.data?.message || 'Napaka pri brisanju športnika.')
+        
+        if (error.response?.status === 401) {
+          this.$router.push('/login')
+        } else {
+          this.showAlert('error', error.response?.data?.message || 'Napaka pri brisanju športnika.')
+        }
       } finally {
         this.deletingAthletes = this.deletingAthletes.filter(id => id !== athlete.id)
       }

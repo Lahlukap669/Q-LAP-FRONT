@@ -204,8 +204,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 import AppAlert from '@/components/ui/AppAlert.vue'
 
@@ -276,21 +275,8 @@ export default {
       this.error = null
       
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-
-        const response = await axios.get(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/microcycle-info/${this.microcycleId}/${this.selectedDayOfWeek}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        // No manual token handling needed!
+        const response = await apiClient.get(`/users/trainer/microcycle-info/${this.microcycleId}/${this.selectedDayOfWeek}`)
 
         this.microcycleInfo = response.data.microcycle_info
         

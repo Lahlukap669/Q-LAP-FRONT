@@ -245,8 +245,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 import AppAlert from '@/components/ui/AppAlert.vue'
 
@@ -368,12 +367,6 @@ export default {
       this.error = null
       
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-
         const periodizationId = this.$route.params.id
         
         if (!periodizationId) {
@@ -381,15 +374,8 @@ export default {
           return
         }
 
-        const response = await axios.get(
-          `${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/periodization-info/${periodizationId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        // No manual token handling needed!
+        const response = await apiClient.get(`/periodization-info/${periodizationId}`)
 
         this.periodizationInfo = response.data.periodization_info
         

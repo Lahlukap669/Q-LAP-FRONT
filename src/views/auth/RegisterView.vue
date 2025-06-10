@@ -28,9 +28,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import bcrypt from 'bcryptjs'  // Import bcryptjs
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient } from '@/utils/api.js'
 import RegistrationForm from '@/components/auth/RegistrationForm.vue'
 import RegistrationFooter from '@/components/auth/RegistrationFooter.vue'
 import AppAlert from '@/components/ui/AppAlert.vue'
@@ -63,13 +61,14 @@ export default {
     async handleRegister(formData) {
       this.loading = true
       
-      try {   
-        const response = await axios.post(`${API_ENDPOINTS.REGISTER}`, {
+      try {
+        // Use centralized apiClient for registration
+        const response = await apiClient.post('/auth/register', {
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone_number: formData.phoneNumber,
           email: formData.email,
-          password: formData.password, // Send hashed password
+          password: formData.password, // Send plain password, backend handles hashing
           role: formData.isTrainer ? 2 : 1,
           gdpr_consent: formData.gdprConsent
         })
@@ -83,10 +82,19 @@ export default {
         }, 2000)
         
       } catch (error) {
-        // Handle registration error
-        const errorMessage = error.response?.data?.message || 'Registracija ni uspešna. Poskusite ponovno.'
-        this.showAlert('error', errorMessage)
         console.error('Registration error:', error)
+        
+        // Handle different error scenarios
+        if (error.response?.status === 400) {
+          this.showAlert('error', error.response.data.message || 'Neveljaven zahtevek.')
+        } else if (error.response?.status === 409) {
+          this.showAlert('error', 'Uporabnik s tem e-poštnim naslovom že obstaja.')
+        } else if (error.response?.status >= 500) {
+          this.showAlert('error', 'Napaka strežnika. Poskusi kasneje.')
+        } else {
+          const errorMessage = error.response?.data?.message || 'Registracija ni uspešna. Poskusite ponovno.'
+          this.showAlert('error', errorMessage)
+        }
       } finally {
         this.loading = false
       }

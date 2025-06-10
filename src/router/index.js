@@ -5,6 +5,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'root',
       redirect: '/login'
     },
     {
@@ -60,19 +61,7 @@ const router = createRouter({
       component: () => import('../views/trainer/CreateTestView.vue')
     },
     
-    // Athlete routes
-    {
-      path: '/athlete',
-      name: 'athlete-dashboard',
-      component: () => import('../views/athlete/DashboardView.vue')
-    },
-
     // Shared routes
-    {
-      path: '/settings',
-      name: 'settings',
-      component: () => import('../views/SettingsView.vue')
-    },
     {
       path: '/periodization-info/:id',
       name: 'periodization-info',

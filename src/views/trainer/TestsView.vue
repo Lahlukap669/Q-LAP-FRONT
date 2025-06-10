@@ -163,8 +163,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 
 export default {
@@ -210,19 +209,8 @@ export default {
       this.error = null
       
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-
-        const response = await axios.get(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/get-tests`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-
+        // No manual token handling needed!
+        const response = await apiClient.get('/users/trainer/get-tests')
         this.tests = response.data.tests || []
         
       } catch (error) {
@@ -264,16 +252,9 @@ export default {
       }
 
       try {
-        const token = localStorage.getItem('access_token')
-        
-        const response = await axios.delete(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/delete-test`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          data: {
-            test_id: id
-          }
+        // No manual token handling needed!
+        const response = await apiClient.delete('/users/trainer/delete-test', {
+          data: { test_id: id }
         })
 
         alert(response.data.message || 'Test uspešno izbrisan')
@@ -281,7 +262,12 @@ export default {
         
       } catch (error) {
         console.error('Napaka pri brisanju testa:', error)
-        alert(error.response?.data?.message || 'Napaka pri brisanju testa')
+        
+        if (error.response?.status === 401) {
+          this.$router.push('/login')
+        } else {
+          alert(error.response?.data?.message || 'Napaka pri brisanju testa')
+        }
       }
     },
 

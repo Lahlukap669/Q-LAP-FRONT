@@ -116,8 +116,7 @@
 
 
 <script>
-import axios from 'axios'
-import { API_ENDPOINTS } from '@/utils/api.js'
+import { apiClient, API_ENDPOINTS } from '@/utils/api.js'
 import TrainerHeader from '@/components/layout/TrainerHeader.vue'
 import AppAlert from '@/components/ui/AppAlert.vue'
 
@@ -171,37 +170,25 @@ export default {
     },
     
     async fetchAthletes() {
-      this.loading = true
-      this.error = null
+      this.loading = true;
+      this.error = null;
       
       try {
-        const token = localStorage.getItem('access_token')
-        if (!token) {
-          this.$router.push('/login')
-          return
-        }
-
-        const response = await axios.get(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/search-athletes`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-
-        this.athletes = response.data.athletes || []
+        // No manual token - apiClient handles it automatically!
+        const response = await apiClient.get('/users/trainer/search-athletes');
+        this.athletes = response.data.athletes || [];
         
       } catch (error) {
-        console.error('Error fetching athletes:', error)
+        console.error('Error fetching athletes:', error);
         
+        // Token expiration handled by interceptor
         if (error.response?.status === 401) {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('user')
-          this.$router.push('/login')
+          this.$router.push('/login');
         } else {
-          this.error = error.response?.data?.message || 'Failed to load athletes'
+          this.error = error.response?.data?.message || 'Failed to load athletes';
         }
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     
@@ -219,39 +206,26 @@ export default {
     },
     
     async addAthlete(athlete) {
-      // Add athlete ID to loading array
-      this.addingAthletes.push(athlete.id)
+      this.addingAthletes.push(athlete.id);
       
       try {
-        const token = localStorage.getItem('access_token')
-        
-        // Use actual API endpoint
-        const response = await axios.post(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/add-athlete`, {
+        // No manual Authorization header needed!
+        const response = await apiClient.post('/users/trainer/add-athlete', {
           athlete_id: athlete.id
-        }, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
+        });
         
-        // Display success message from API response
-        this.showAlert('success', response.data.message || `${response.data.athlete_name} successfully added!`)
+        this.showAlert('success', response.data.message || `${response.data.athlete_name} successfully added!`);
+        this.athletes = this.athletes.filter(a => a.id !== athlete.id);
         
-        // Remove athlete from list after successful addition
-        this.athletes = this.athletes.filter(a => a.id !== athlete.id)
-        
-        // Refresh the athlete list after a brief delay to show the message
         setTimeout(() => {
-          this.fetchAthletes()
-        }, 2000)
+          this.fetchAthletes();
+        }, 2000);
         
       } catch (error) {
-        console.error('Error adding athlete:', error)
-        this.showAlert('error', error.response?.data?.message || 'Failed to add athlete')
+        console.error('Error adding athlete:', error);
+        this.showAlert('error', error.response?.data?.message || 'Failed to add athlete');
       } finally {
-        // Remove from loading array
-        this.addingAthletes = this.addingAthletes.filter(id => id !== athlete.id)
+        this.addingAthletes = this.addingAthletes.filter(id => id !== athlete.id);
       }
     },
     

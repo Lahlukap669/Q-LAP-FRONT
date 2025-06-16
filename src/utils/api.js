@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 // Your existing base URL (perfect!)
-const API_BASE_URL = 'https://bcb6-130-61-235-109.ngrok-free.app/api';
+const API_BASE_URL = 'http://qlap-flaskapi.ddns.net:5000/api';
 
 // Create centralized axios instance
 const apiClient = axios.create({

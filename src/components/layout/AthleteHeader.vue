@@ -20,7 +20,7 @@
           <router-link to="" class="flex items-center hover:text-white/80 transition duration-200">
             <i class="fas fa-chart-line mr-2"></i>Analitika
           </router-link>
-          <router-link to="" class="flex items-center hover:text-white/80 transition duration-200">
+          <router-link to="/athlete/tests" class="flex items-center hover:text-white/80 transition duration-200">
             <i class="fas fa-flask mr-2"></i>Testi
           </router-link>
         </nav>
@@ -92,7 +92,7 @@
               <span class="text-lg">Analitika</span>
             </router-link>
             <router-link 
-              to="" 
+              to="/athlete/tests" 
               @click="closeMobileNav"
               class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
             >

@@ -67,6 +67,11 @@ const router = createRouter({
       name: 'athlete-dashboard',
       component: () => import('../views/athlete/DashboardView.vue')
     },
+    {
+      path: '/athlete/tests',
+      name: 'a-tests',
+      component: () => import('../views/athlete/TestsView.vue')
+    },
     
     // Shared routes
     {

@@ -372,6 +372,7 @@ export default {
       this.error = null
       
       try {
+        console.log(this.selectedDate)
         const response = await apiClient.post('/users/athlete/microcycle-info', {
           current_date: this.selectedDate
         })

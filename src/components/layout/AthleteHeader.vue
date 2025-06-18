@@ -14,10 +14,7 @@
           <router-link to="/athlete" class="flex items-center hover:text-white/80 transition duration-200">
             <i class="fas fa-home mr-2"></i>Nadzorna plošča
           </router-link>
-          <router-link to="" class="flex items-center hover:text-white/80 transition duration-200">
-            <i class="fas fa-users mr-2"></i>Športniki
-          </router-link>
-          <router-link to="" class="flex items-center hover:text-white/80 transition duration-200">
+          <router-link to="/athlete/visualizations" class="flex items-center hover:text-white/80 transition duration-200">
             <i class="fas fa-chart-line mr-2"></i>Analitika
           </router-link>
           <router-link to="/athlete/tests" class="flex items-center hover:text-white/80 transition duration-200">
@@ -76,15 +73,7 @@
               <span class="text-lg">Nadzorna plošča</span>
             </router-link>
             <router-link 
-              to="" 
-              @click="closeMobileNav"
-              class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
-            >
-              <i class="fas fa-users mr-4 text-lg"></i>
-              <span class="text-lg">Športniki</span>
-            </router-link>
-            <router-link 
-              to="" 
+              to="/athlete/visualizations" 
               @click="closeMobileNav"
               class="flex items-center text-gray-700 hover:text-blue-600 hover:bg-gray-50 py-3 px-4 rounded-lg transition duration-200"
             >

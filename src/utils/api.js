@@ -38,8 +38,7 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// Your existing endpoints (keep these!)
+   
 export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/auth/login`,
   REGISTER: `${API_BASE_URL}/auth/register`,

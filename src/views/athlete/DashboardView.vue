@@ -60,10 +60,22 @@
             </div>
           </div>
           
-          <!-- Loading indicator for day changes -->
-          <div v-if="loading && headerMounted" class="flex items-center text-white">
-            <i class="fas fa-spinner fa-spin mr-2"></i>
-            <span>Nalaganje...</span>
+          <div class="flex items-center space-x-4">
+            <!-- Loading indicator for day changes -->
+            <div v-if="loading && headerMounted" class="flex items-center text-white">
+              <i class="fas fa-spinner fa-spin mr-2"></i>
+              <span>Nalaganje...</span>
+            </div>
+            
+            <!-- Periodization Info Button -->
+            <button 
+              @click="openPeriodizationInfo" 
+              class="periodization-button"
+              :disabled="!dayInfo?.periodization_id"
+            >
+              <i class="fas fa-chart-line mr-2"></i>
+              <span>Ciklizacija</span>
+            </button>
           </div>
         </div>
       </div>
@@ -270,8 +282,8 @@ export default {
       saving: false,
       error: null,
       dayInfo: null,
-      originalExerciseStatus: {}, // Track original status for changes
-      selectedDate: this.getCurrentDate(),
+      originalExerciseStatus: {},
+      selectedDate: this.getInitialDate(),
       showModal: false,
       selectedExercise: {},
       headerMounted: false,
@@ -303,9 +315,23 @@ export default {
     availableDates() {
       const dates = []
       const today = new Date()
+      const selectedDateObj = new Date(this.selectedDate)
       
-      // Generate dates for 7 days back and 7 days forward
-      for (let i = -7; i <= 7; i++) {
+      // Calculate the range to ensure selected date is included
+      let startRange = -7
+      let endRange = 7
+      
+      // If selected date is outside the normal range, extend the range
+      const daysDiff = Math.floor((selectedDateObj - today) / (1000 * 60 * 60 * 24))
+      
+      if (daysDiff < -7) {
+        startRange = daysDiff - 1 // Extend range to include selected date
+      } else if (daysDiff > 7) {
+        endRange = daysDiff + 1 // Extend range to include selected date
+      }
+      
+      // Generate dates for the calculated range
+      for (let i = startRange; i <= endRange; i++) {
         const date = new Date(today)
         date.setDate(today.getDate() + i)
         
@@ -318,6 +344,9 @@ export default {
         
         dates.push({ value, label })
       }
+      
+      // Sort dates to ensure proper order
+      dates.sort((a, b) => new Date(a.value) - new Date(b.value))
       
       return dates
     },
@@ -340,7 +369,6 @@ export default {
     hasUnsavedChanges() {
       if (!this.dayInfo?.methods) return false
       
-      // Check if any exercise status has changed from original
       for (const method of this.dayInfo.methods) {
         for (const exercise of method.exercises) {
           const original = this.originalExerciseStatus[exercise.exercise_id]
@@ -353,8 +381,9 @@ export default {
     }
   },
   methods: {
-    getCurrentDate() {
-        return new Date().toISOString().split('T')[0]
+    getInitialDate() {
+      // Use query param or current date
+      return this.$route.query.date || new Date().toISOString().split('T')[0]
     },
     
     showAlert(type, message) {
@@ -365,6 +394,20 @@ export default {
       }
     },
     
+    openPeriodizationInfo() {
+      if (!this.dayInfo?.periodization_id) {
+        this.showAlert('info', 'Informacije o ciklizaciji niso na voljo.')
+        return
+      }
+
+      // Navigate to periodization info using the periodization_id from dayInfo
+      this.$router.push(`/athlete/periodization-info/${this.dayInfo.periodization_id}`)
+        .catch(err => {
+          console.error('Navigation error:', err)
+          this.showAlert('error', 'Napaka pri navigaciji na ciklizacijo.')
+        })
+    },
+    
     async fetchDayExercises() {
       if (!this.headerMounted) {
         this.loading = true
@@ -372,15 +415,14 @@ export default {
       this.error = null
       
       try {
-        console.log(this.selectedDate)
+        console.log('Fetching exercises for date:', this.selectedDate)
         const response = await apiClient.post('/users/athlete/microcycle-info', {
           current_date: this.selectedDate
         })
-        console.log(this.selectedDate)
-
-        this.dayInfo = response.data
         
-        // Store original exercise status for change tracking
+        this.dayInfo = response.data
+        console.log('Day info loaded:', this.dayInfo)
+        
         this.storeOriginalExerciseStatus()
         
         if (!this.headerMounted) {
@@ -396,7 +438,6 @@ export default {
           this.$router.push('/login')
         } else {
           this.error = error.response?.data?.message || 'Napaka pri nalaganju vaj za ta dan.'
-          // Set dayInfo to null on error so "Ni vaj na ta dan" shows
           this.dayInfo = null
         }
       } finally {
@@ -437,7 +478,6 @@ export default {
     },
 
     toggleExerciseCompletion(exercise) {
-      // Simply toggle the status without showing alert
       exercise.exercise_finished = !exercise.exercise_finished
     },
 
@@ -447,7 +487,6 @@ export default {
       this.saving = true
       
       try {
-        // Prepare exercises status array
         const exercisesStatus = []
         
         this.dayInfo.methods.forEach(method => {
@@ -467,13 +506,9 @@ export default {
 
         const response = await apiClient.post('/users/athlete/save-finished-exercises', payload)
         
-        // Show success message
         this.showAlert('success', response.data.message || 'Spremembe uspešno shranjene')
-        
-        // Update original status to current status (changes are now saved)
         this.storeOriginalExerciseStatus()
         
-        // Handle partial success or failed exercises
         if (response.data.failed_exercises && response.data.failed_exercises.length > 0) {
           console.warn('Nekatere vaje niso bile posodobljene:', response.data.failed_exercises)
           this.showAlert('warning', 'Nekatere vaje niso bile posodobljene')
@@ -518,6 +553,19 @@ export default {
     }
   },
   
+  watch: {
+    '$route.query.date': {
+      handler(newDate) {
+        const targetDate = newDate || new Date().toISOString().split('T')[0]
+        if (targetDate !== this.selectedDate) {
+          this.selectedDate = targetDate
+          this.fetchDayExercises()
+        }
+      },
+      immediate: true
+    }
+  },
+  
   mounted() {
     const token = localStorage.getItem('access_token')
     if (!token) {
@@ -525,9 +573,11 @@ export default {
       return
     }
     
+    console.log('DashboardView mounted with route:', this.$route)
+    console.log('Selected date:', this.selectedDate)
+    
     this.fetchDayExercises()
     
-    // Keyboard navigation
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft') {
         this.previousDay()
@@ -556,6 +606,30 @@ export default {
 .exercise-date-header {
   background: #10b981;
   backdrop-filter: blur(10px);
+}
+
+/* Periodization Button */
+.periodization-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.periodization-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.periodization-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Rest Day Banner */

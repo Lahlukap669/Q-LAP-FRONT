@@ -60,6 +60,11 @@ const router = createRouter({
       name: 'create-test',
       component: () => import('../views/trainer/CreateTestView.vue')
     },
+    {
+      path: '/periodization-info/:id',
+      name: 'periodization-info',
+      component: () => import('../views/trainer/PeriodizationInfoView.vue')
+    },
 
     // Athlete routes
     {
@@ -77,13 +82,13 @@ const router = createRouter({
       name: 'a-visualizations',
       component: () => import('../views/athlete/VisualizationsView.vue')
     },
-    
-    // Shared routes
     {
-      path: '/periodization-info/:id',
-      name: 'periodization-info',
-      component: () => import('../views/PeriodizationInfoView.vue')
+      path: '/athlete/periodization-info/:id',
+      name: 'a-periodization-info',
+      component: () => import('../views/athlete/PeriodizationInfoView.vue')
     }
+
+    // Shared routes
   ]
 })
 

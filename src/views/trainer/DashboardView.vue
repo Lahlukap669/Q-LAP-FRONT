@@ -144,16 +144,14 @@ export default {
         }
 
         // Use DELETE method instead of POST
-        const response = await axios.delete(`${API_ENDPOINTS.LOGIN.replace('/auth/login', '')}/users/trainer/delete-periodization`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          // For DELETE with body, use data property
-          data: {
+        const response = await apiClient.delete('/users/trainer/delete-periodization', {
+          data: JSON.stringify({
             periodization_id: id
+          }),
+          headers: {
+            'Content-Type': 'application/json'
           }
-        })
+        });
 
         // Show success message
         if (this.showAlert) {
